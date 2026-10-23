@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Aerodynamic outer pulse halo ring -->
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M 32,54 A 24,24 0 1,1 68,74" />
+
+    <!-- Pulse waveform breath rhythm -->
+    <path
+        android:strokeColor="#10B981"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M 28,54 L 38,54 L 44,38 L 52,68 L 60,46 L 68,58 L 74,54 L 80,54" />
+
+    <!-- Dynamic Runner Silhouette / Crest in Aero Cyan -->
+    <!-- Runner head -->
+    <path
+        android:fillColor="#00F2FE"
+        android:pathData="M 58,32 A 4.5,4.5 0 1,0 58,23 A 4.5,4.5 0 1,0 58,32 Z" />
+
+    <!-- Runner forward motion body & limbs -->
+    <path
+        android:strokeColor="#00F2FE"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M 56,34 L 52,47 L 43,53 M 52,47 L 61,56 L 67,52 M 52,43 L 64,40 M 52,43 L 45,39" />
+
+    <!-- Radar Target Nodes -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 44,38 A 2,2 0 1,0 44,34 A 2,2 0 1,0 44,38 Z" />
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M 52,68 A 2,2 0 1,0 52,64 A 2,2 0 1,0 52,68 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 60,46 A 2,2 0 1,0 60,42 A 2,2 0 1,0 60,46 Z" />
+</vector>

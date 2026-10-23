@@ -1,0 +1,6 @@
+{
+  "name": "AeroPulse",
+  "description": "Atmospheric, air quality, pollen and solar radar delivering outdoor Go/No-Go windows with Wear OS simulation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

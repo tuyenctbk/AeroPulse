@@ -1,0 +1,332 @@
+Language,Title,Short_Description,Full_Description
+en-US,AeroPulse: Breath & Run Radar,"Live PM2.5 air quality, pollen counts, solar UV and outdoor Go/No-Go windows.","AeroPulse is an environmental intelligence radar engineered for endurance runners, cyclists, parents with young children, and allergy sufferers. It aggregates high-precision atmospheric and space weather feeds to calculate an instant, personalized outdoor ""Go / No-Go"" window.
+
+KEY FEATURES:
+
+• REAL-TIME GO / NO-GO ENGINE
+Evaluates particulate matter, solar UV, and allergen concentrations against your personal activity sensitivity to provide an immediate 0-100 environmental score and safe window recommendation.
+
+• 24-HOUR RADAR TIMELINE
+Explore an interactive hourly breakdown of expected PM2.5 spikes, ambient temperature, and UV radiation over the next 24 hours to schedule outdoor workouts at peak clean air times.
+
+• MULTI-PROFILE SENSITIVITY
+Switch dynamically between customized activity modes:
+- Runners & Athletes: High sensitivity to fine particulate matter (PM2.5) and ground-level ozone (O3).
+- Allergy & Asthma Sufferers: Botanical allergen focus prioritizing grass and ragweed pollen.
+- Parents & Strollers: Strict solar UV exposure limits and toddler ground-particulate protection.
+- Pet Walkers: Ground-level heat alerts, hot asphalt warnings, and dust monitoring.
+
+• BOTANICAL POLLEN RADAR
+Detailed botanical concentration monitoring for Grass (Poaceae), Ragweed (Ambrosia), Birch (Betula), and Alder (Alnus) with dominant species detection and risk severity meters.
+
+• AIR PURITY MATRIX
+Comprehensive readouts for fine particulates (PM2.5, PM10), US Air Quality Index (AQI), European AQI, ground-level ozone, nitrogen dioxide (NO2), carbon monoxide, and atmospheric dust.
+
+• SOLAR ARC & GOLDEN HOURS
+Live solar UV index gauge, peak UV time prediction, sunrise, sunset, and morning and evening golden hour windows.
+
+• NOAA SPACE WEATHER RADAR
+Real-time planetary geomagnetic Kp-index telemetry from NOAA SWPC, geomagnetic storm classification (G0 to G5), aurora visibility prospects, and GPS tracking reception advisories for outdoor sports watches.
+
+• WEAR OS COMPANION PREVIEW
+Simulate and preview glanceable circular Wear OS watch faces with live Go/No-Go halo score rings and interactive wrist quick tiles.
+
+• SMART RADAR LOCATIONS
+Auto-detect coordinates via on-device GPS, search worldwide cities through open geocoding, and store favorite trailheads and running routes locally.
+
+DATA TRANSPARENCY:
+Atmospheric air quality, meteorological data, and botanical pollen forecasts are provided by the open Open-Meteo Air Quality and Weather APIs. Planetary space weather telemetry is provided by NOAA Space Weather Prediction Center feeds. AeroPulse operates without mandatory accounts and preserves your privacy."
+es-ES,AeroPulse: Radar de Aire,"Calidad del aire PM2.5, polen, radiación UV y ventanas seguras para correr.","AeroPulse es un radar ambiental inteligente diseñado para corredores, ciclistas, familias y personas con alergias respiratorias. Integra datos atmosféricos de alta precisión para ofrecerte una recomendación clara de ventana segura ""Salir / Esperar"".
+
+CARACTERÍSTICAS PRINCIPALES:
+
+• MOTOR INTELIGENTE GO / NO-GO
+Calcula un índice de 0 a 100 evaluando partículas finas, índice UV y concentración de alérgenos según tu perfil deportivo o de salud.
+
+• LÍNEA DE TIEMPO DE 24 HORAS
+Pronóstico hora a hora con picos de PM2.5, temperatura y radiación solar para planificar entrenamientos al aire libre en momentos óptimos.
+
+• PERFILES DE SENSIBILIDAD PERSONALIZADOS
+- Corredores y Atletas: Mayor protección frente a PM2.5 y ozono troposférico (O3).
+- Alergias y Asma: Enfoque en pólenes de gramíneas, ambrosía, abedul y aliso.
+- Familias y Paseos: Límites estrictos de radiación UV y protección infantil.
+- Paseo con Mascotas: Alertas de temperatura en asfalto y polvo a nivel del suelo.
+
+• RADAR BOTÁNICO DE POLEN
+Seguimiento de especies botánicas: gramíneas, ambrosía, abedul y aliso, con detección de especie dominante y nivel de riesgo.
+
+• MATRIZ DE PUREZA DEL AIRE
+Medición de PM2.5, PM10, ICA de EE. UU., ICA europeo, ozono y dióxido de nitrógeno.
+
+• CICLO SOLAR Y HORAS DORADAS
+Índice UV en tiempo real, hora de máxima radiación, amanecer, atardecer y horas doradas para entrenar o fotografiar.
+
+• CLIMA ESPACIAL NOAA
+Índice Kp geomagnético en tiempo real, alertas de tormentas solares y estado de precisión satelital para relojes GPS.
+
+• COMPAÑERO WEAR OS
+Previsualización de esferas y tarjetas circulares con halo de estado ambiental para relojes inteligentes.
+
+Privacidad total: sin registro obligatorio y almacenamiento local en el dispositivo."
+fr-FR,AeroPulse: Radar d Air & Run,"Qualité de l air PM2.5, pollens, indice UV et fenêtres optimales de course.","AeroPulse est un radar environnemental conçu pour les coureurs d endurance, les cyclistes, les parents et les personnes allergiques. Il analyse les flux atmosphériques pour fournir un créneau extérieur optimal en temps réel.
+
+FONCTIONNALITÉS CLÉS:
+
+• CALCULATEUR EXTÉRIEUR OPTIMAL
+Évalue les particules fines, l indice UV et les pollens pour attribuer un score de 0 à 100 et un statut clair (Optimal, Prudence ou Déconseillé).
+
+• PRÉVISION HEURE PAR HEURE SUR 24H
+Visualisez les pics de PM2.5, la température et les indices UV pour choisir le meilleur moment pour votre séance de sport.
+
+• PROFILS D ACTIVITÉ MULTIPLES
+- Coureurs et Athlètes: Sensibilité accrue aux pics de PM2.5 et à l ozone.
+- Allergies et Asthme: Surveillance ciblée des pollens de graminées et d ambroisie.
+- Parents et Poussettes: Vigilance UV renforcée pour les enfants.
+- Promeneurs d Animaux: Alerte chaleur du sol et poussières rases.
+
+• RADAR BOTANIQUE DES POLLENS
+Mesures précises pour les graminées, l ambroisie, le bouleau et l aulne avec niveau de risque détaillé.
+
+• MATRICE DE QUALITÉ DE L AIR
+Données PM2.5, PM10, AQI européen et américain, ozone et dioxyde d azote.
+
+• HORLOGE SOLAIRE & HEURES DORÉES
+Indice UV, heure de pic solaire, lever, coucher du soleil et heures dorées matinales et vespérales.
+
+• MÉTÉO SPATIALE NOAA
+Indice Kp en direct, suivi des orages géomagnétiques et impact sur la précision GPS des montres de sport.
+
+• SIMULATEUR WEAR OS
+Aperçu interactif des cadrans circulaires et tuiles rapides Wear OS avec anneau de score instantané.
+
+Respect de la vie privée: données stockées localement, aucune création de compte requise."
+de-DE,AeroPulse: Luft & Lauf Radar,"Echtzeit PM2.5 Luftqualität, Pollen, UV-Index und optimale Lauf-Fenster.","AeroPulse ist ein atmosphärischer Intelligenzradar für Läufer, Radfahrer, Familien und Allergiker. Die App kombiniert meteorologische und Weltraumwetter-Daten, um saubere Outdoor-Fenster zu berechnen.
+
+HAUPTFUNKTIONEN:
+
+• GO / NO-GO ENTSCHEIDUNGSHILFE
+Berechnet einen Umweltindex von 0 bis 100 basierend auf Feinstaub (PM2.5), Ozon, Pollen und UV-Strahlung, abgestimmt auf Ihr persönliches Empfindlichkeitsprofil.
+
+• 24-STUNDEN-RADAR-ZEITLEISTE
+Stündliche Übersicht über Feinstaubspitzen, Temperaturen und UV-Belastung zur Planung Ihrer Trainingseinheiten.
+
+• ANPASSBARE NUTZERPROFILE
+- Läufer & Sportler: Fokus auf Lungenventilation bei Feinstaub und Ozon.
+- Allergiker & Asthmatiker: Überwachung von Gräser-, Birken- und Ambrosiapollen.
+- Eltern mit Kleinkindern: Strenger UV-Schutz und saubere bodennahe Luft.
+- Hundehalter: Schutz vor heißem Asphalt und bodennahem Staub.
+
+• BOTANISCHER POLLENRADAR
+Überwachung von Gräser-, Ambrosia-, Birken- und Erlenpollen mit Risikoeinstufung.
+
+• UMFASSENDE LUFTQUALITÄTSMATRIX
+Messwerte für PM2.5, PM10, europäischen und US-Luftqualitätsindex (AQI), Ozon und Stickstoffdioxid.
+
+• SONNENRHYTHMUS & GOLDENE STUNDE
+Echtzeit UV-Index, Spitzenzeit-Prognose, Sonnenaufgang, Sonnenuntergang und Goldene Stunde.
+
+• NOAA WELTRAUMWETTER
+Planetaner Kp-Index in Echtzeit, geomagnetische Sturmwarnungen und Auswirkung auf GPS-Sportuhren.
+
+• WEAR OS VORSCHAU
+Interaktive Simulation von Wear OS Zifferblättern und Kacheln mit Statusring.
+
+100% Datenschutz: Alle Favoriten bleiben auf Ihrem Gerät gespeichert."
+it-IT,AeroPulse: Radar Aria & Corsa,"Qualità dell aria PM2.5, pollini, indice UV e orari sicuri per allenarsi.","AeroPulse è il radar atmosferico dedicato a runner, ciclisti, genitori e persone con allergie. Analizza la qualità dell aria e il meteo solare per suggerire la finestra ideale di attività all aperto.
+
+CARATTERISTICHE:
+• Punteggio Go/No-Go da 0 a 100 per l aria pulita
+• Timeline oraria a 24 ore con picchi di PM2.5 e UV
+• Profili dedicati: Runner, Allergie, Genitori, Animali
+• Radar pollini: graminacee, ambrosia, betulla e ontano
+• Matrice qualità aria con AQI e ozono
+• Alba, tramonto, ora d oro e picco UV
+• Dati meteo spaziale NOAA e indice Kp
+• Simulatore quadrante e scheda Wear OS
+Nessun account obbligatorio, massima privacy."
+pt-BR,AeroPulse: Radar de Ar e Run,"Qualidade do ar PM2.5, pólen, índice UV e janela ideal para corrida.","AeroPulse é o radar inteligente para corredores, ciclistas, famílias e quem sofre de alergias. Calcula o melhor horário para atividades ao ar livre com base em dados de ar e radiação solar.
+
+RECURSOS:
+• Cálculo inteligente de janela segura de 0 a 100
+• Previsão horária de 24 horas para PM2.5 e radiação UV
+• Perfis personalizados para corrida, alergias, crianças e pets
+• Monitoramento de pólen e espécies dominantes
+• Matriz completa de poluição com PM2.5, PM10, ozônio e AQI
+• Horários de nascer, pôr do sol e hora de ouro
+• Dados geomagnéticos NOAA Kp para precisão de relógios GPS
+• Simulador de mostradores e tiles para Wear OS
+Privacidade garantida com armazenamento local."
+ja-JP,AeroPulse: 大気＆ランニングレーダー,PM2.5、花粉、UV指数から屋外運動の最適時間帯をリアルタイム判定。,"AeroPulseは、ランナー、サイクリスト、花粉症の方、子育て中の家族のための環境レーダーアプリです。大気質、花粉、紫外線、NOAA宇宙天気を統合し、安全な外出タイミングを判定します。
+
+主な機能:
+• 0〜100のリアルタイム「Go / No-Go」スコア
+• 24時間の大気汚染・PM2.5・UVタイムライン
+• ランナー、アレルギー、子供、ペット向け感度切替
+• イネ科、ブタクサ、カバノキ等の花粉レーダー
+• 日出・日没・ゴールデンアワー・UVピーク予測
+• NOAA SWPC宇宙天気とKp指数（GPS精度情報）
+• 円形Wear OSスマートウォッチ文字盤＆タイルのシミュレーター
+アカウント登録不要・端末ローカル保存で安心のプライバシー。"
+ko-KR,AeroPulse: 공기질 & 러닝 레이더,"초미세먼지 PM2.5, 꽃가루, 자외선 지수 기반 야외 러닝 추천 창.","AeroPulse는 러너, 사이클리스트, 알레르기 비염 환자, 유모차 나들이 부모를 위한 실시간 대기 환경 레이더입니다.
+
+주요 기능:
+• 0~100점 실시간 Go / No-Go 야외 활동 지수
+• 24시간 시간별 초미세먼지(PM2.5) 및 자외선 예보
+• 러너, 알레르기, 어린이 보호, 반려견 맞춤형 프로필
+• 잔디, 돼지풀, 자작나무 꽃가루 위험도 알림
+• 일출, 일몰, 골든 아워 및 자외선 최고 시각
+• NOAA 우주 날씨 및 Kp 지수(GPS 위성 영향 분석)
+• 스마트워치용 Wear OS 워치 페이스 및 타일 시뮬레이터
+개인정보 수집 없이 기기 내 로컬 저장으로 안전합니다."
+zh-CN,AeroPulse: 空气与跑步雷达,实时PM2.5空气质量、花粉指数、紫外线与户外最佳跑步时段预测。,"AeroPulse 是一款专为跑者、骑行爱好者、过敏人群和家长打造的大气环境雷达，综合分析细颗粒物、花粉与紫外线，提供一目了然的户外出行窗口。
+
+核心特性：
+• 0至100分实时出行安全判定
+• 24小时逐小时PM2.5峰值与紫外线预报
+• 跑者、呼吸道过敏、亲子婴儿车、宠物散步4大定制模式
+• 禾本科、豚草、桦树花粉浓度监测
+• 日出、日落、黄金时刻与紫外线峰值预测
+• NOAA地磁Kp指数与GPS手表定位参考
+• 圆形Wear OS智能手表表盘与磁贴预览
+无需注册登录，数据严格保留于本地设备。"
+zh-TW,AeroPulse: 空氣與跑步雷達,即時PM2.5空氣品質、花粉濃度、紫外線與戶外最佳跑步時間分析。,"AeroPulse 結合開放氣象與NOAA太空天氣資料，為跑步、過敏族群與戶外愛好者計算出最佳出門時段。
+
+功能亮點：
+• 0~100分即時 Go / No-Go 出行建議
+• 24小時細懸浮微粒(PM2.5)與紫外線趨勢圖
+• 跑者運動、過敏氣喘、親子推車、寵物散步專屬設定
+• 植物花粉濃度與主要過敏原監測
+• 包含日出、日落、黃金運動時刻
+• NOAA地磁Kp指數與GPS手錶訊號指引
+• Wear OS智慧手錶圓形錶面與快訊磁貼預覽
+純本地儲存，保障您的位置隱私。"
+vi-VN,AeroPulse: Radar Khí & Chạy,"Chỉ số PM2.5, phấn hoa, tia UV và thời điểm an toàn để chạy bộ ngoài trời.","AeroPulse là radar môi trường thông minh dành cho người chạy bộ, đạp xe, phụ huynh và người có cơ địa dị ứng thời tiết.
+
+TÍNH NĂNG CHÍNH:
+• Điểm đánh giá Go / No-Go từ 0 đến 100 theo thời gian thực
+• Biểu đồ 24 giờ dự báo bụi mịn PM2.5, nhiệt độ và chỉ số tia UV
+• 4 chế độ chuyên biệt: Vận động viên chạy bộ, Dị ứng & Hen suyễn, Phụ huynh có con nhỏ, Dắt thú cưng
+• Radar phấn hoa thực vật cỏ và cỏ dại chi tiết
+• Ma trận chất lượng không khí với AQI Mỹ và châu Âu
+• Giờ hoàng hôn, bình minh và giờ vàng chạy bộ
+• Thời tiết không gian NOAA và chỉ số Kp từ trường Trái Đất
+• Trình mô phỏng mặt đồng hồ và Wear OS Tile trực quan
+Bảo mật tuyệt đối, lưu trữ cục bộ, không cần tài khoản."
+hi-IN,AeroPulse: वायु और रन राडार,"रीयल-टाइम PM2.5 वायु गुणवत्ता, परागकण, UV और सुरक्षित रनिंग विंडो।","AeroPulse धावकों, माता-पिता और एलर्जी से संवेदनशील लोगों के लिए एक सटीक पर्यावरण राडार है।
+
+मुख्य विशेषताएं:
+• रीयल-टाइम 0-100 Go/No-Go आउटडोर स्कोर
+• 24 घंटे का PM2.5 और UV पूर्वानुमान
+• रनर, एलर्जी और परिवार के लिए विशेष प्रोफाइल
+• परागकण और वायु गुणवत्ता का संपूर्ण विश्लेषण
+• सूर्योदय, सूर्यास्त और गोल्डन आवर ट्रैकिंग
+• NOAA अंतरिक्ष मौसम और Kp इंडेक्स
+• Wear OS स्मार्टवॉच पूर्वावलोकन
+पूरी तरह से सुरक्षित और स्थानीय डेटा संग्रहण।"
+ar-SA,AeroPulse: رادار الهواء والجري,جودة الهواء PM2.5 وحبوب اللقاح والأشعة فوق البنفسجية للجري في الهواء الطلق.,"تطبيق AeroPulse هو رادار بيئي ذكي للعدائين ومرضى الحساسية والعائلات لتحديد أفضل أوقات الخروج في الهواء الطلق.
+
+المزايا:
+• مؤشر الخروج الآمن Go / No-Go من 0 إلى 100
+• جدول زمني 24 ساعة لجزيئات PM2.5 والأشعة فوق البنفسجية
+• أوضاع مخصصة للرياضيين، الحساسية، والأطفال
+• رادار حبوب اللقاح النباتية
+• أوقات الشروق والغروب والساعة الذهبية
+• بيانات طقس الفضاء من NOAA ومؤشر Kp
+• معاينة واجهات الساعات الذكية Wear OS
+حماية تامة للخصوصية بدون حسابات إجبارية."
+ru-RU,AeroPulse: Воздух и Бег,"Качество воздуха PM2.5, пыльца, УФ-индекс и лучшее время для пробежек.","AeroPulse — экологический радар для бегунов, родителей и людей с аллергией. Рассчитывает безопасные окна для тренировок на свежем воздухе.
+
+ОСОБЕННОСТИ:
+• Оценка Go / No-Go от 0 до 100 в реальном времени
+• 24-часовой прогноз скачков PM2.5, температуры и УФ
+• Профили: Бегун, Аллергия, Родители с коляской, Питомцы
+• Мониторинг пыльцы злаков, амброзии и березы
+• Матрица чистоты воздуха с AQI, озоном и пылью
+• Рассвет, закат, золотой час и пик УФ
+• Геомагнитный Kp-индекс NOAA для спортивных GPS-часов
+• Симулятор циферблата и плитки Wear OS
+Конфиденциальность без регистрации."
+id-ID,AeroPulse: Radar Udara & Lari,"Kualitas udara PM2.5, serbuk sari, indeks UV, dan waktu aman berolahraga.","AeroPulse adalah radar atmosfer cerdas untuk pelari, pesepeda, orang tua, dan penderita alergi pernapasan.
+
+FITUR UTAMA:
+• Skor pintar Go / No-Go 0 hingga 100
+• Garis waktu 24 jam untuk PM2.5 dan radiasi UV
+• Profil khusus atlet, alergi, anak, dan hewan peliharaan
+• Radar serbuk sari tanaman
+• Data polusi lengkap: PM2.5, PM10, AQI, dan ozon
+• Matahari terbit, terbenam, dan golden hour
+• Cuaca antariksa NOAA dan indeks Kp untuk akurasi GPS
+• Pratinjau watch face & tile untuk Wear OS
+Aman dan privasi terjaga di perangkat Anda."
+tr-TR,AeroPulse: Hava ve Koşu Radar,"PM2.5 hava kalitesi, polen, UV indeksi ve açık hava koşu pencereleri.","AeroPulse; koşucular, alerji hastaları ve aileler için açık havada en temiz zamanı hesaplayan akıllı çevre radarıdır.
+
+ÖZELLİKLER:
+• 0-100 arası anlık Go / No-Go açık hava skoru
+• 24 saatlik PM2.5 ve UV tahmin çizelgesi
+• Koşucu, alerji, çocuk ve evcil hayvan profilleri
+• Çim ve yabani ot polen radarı
+• Detaylı hava saflık matrisi ve AQI değerleri
+• Gündoğumu, günbatımı ve altın saat zamanlaması
+• NOAA uzay havası Kp indeksi ve GPS uyarısı
+• Wear OS akıllı saat kadranı ve kutucuk simülasyonu
+Verileriniz cihazınızda yerel olarak saklanır."
+nl-NL,AeroPulse: Lucht & Hardlopen,"Realtime PM2.5 luchtkwaliteit, pollen, UV-index en veilige hardloopuren.","AeroPulse is de omgevingsradar voor hardlopers, fietsers, ouders en mensen met allergieën.
+
+KENMERKEN:
+• Go / No-Go score van 0 tot 100 voor veilige buitenlucht
+• 24-uurs tijdlijn met PM2.5-pieken en UV-index
+• Profielen voor atleten, allergieën, ouders en huisdieren
+• Botanische pollenradar voor grassen en bomen
+• Luchtzuiverheidsmatrix met Europese en Amerikaanse AQI
+• Zonsopgang, zonsondergang en gouden uren
+• NOAA ruimteweer en geomagnetische Kp-index
+• Interactieve Wear OS preview
+Volledige privacy met lokale opslag."
+pl-PL,AeroPulse: Radar Powietrza,"Jakość powietrza PM2.5, pyłki, UV i najlepszy czas na bieg na zewnątrz.","AeroPulse to inteligentny radar atmosferyczny dla biegaczy, rodziców i alergików.
+
+FUNKCJE:
+• Wskaźnik Go / No-Go od 0 do 100 w czasie rzeczywistym
+• 24-godzinna oś prognozy stężeń PM2.5 i promieniowania UV
+• Profile: Biegacz, Alergik, Rodzina, Spacer ze zwierzęciem
+• Radar stężenia pyłków traw i chwastów
+• Pomiary czystości powietrza: PM2.5, PM10, ozon i AQI
+• Wschód i zachód słońca oraz złota godzina
+• Pogoda kosmiczna NOAA Kp dla zegarków GPS
+• Podgląd tarczy i kafelka Wear OS
+Prywatność i lokalne przechowywanie danych."
+th-TH,AeroPulse: เรดาร์อากาศและวิ่ง,ตรวจคุณภาพอากาศ PM2.5 ละอองเกสร รังสี UV และช่วงเวลาวิ่งกลางแจ้งที่ปลอดภัย,"AeroPulse เป็นเรดาร์สภาพแวดล้อมอัจฉริยะสำหรับนักวิ่ง ผู้มีภูมิแพ้ และครอบครัว
+
+จุดเด่น:
+• คะแนน Go / No-Go 0-100 แบบเรียลไทม์
+• ไทม์ไลน์ 24 ชั่วโมงพยากรณ์ PM2.5 และ UV ล่วงหน้า
+• โหมดปรับแต่งสำหรับนักกีฬา ภูมิแพ้ เด็กเล็ก และสัตว์เลี้ยง
+• เรดาร์ละอองเกสรพืช
+• ดัชนีคุณภาพอากาศ AQI ฝุ่นละออง และก๊าซโอโซน
+• เวลาพระอาทิตย์ขึ้น พระอาทิตย์ตก และโกลเด้นฮาวเออร์
+• สภาพอวกาศ NOAA ดัชนี Kp เพื่อความแม่นยำของนาฬิกา GPS
+• จำลองหน้าปัดนาฬิกาและไทล์ Wear OS
+ไม่มีการเก็บข้อมูลส่วนบุคคล ปลอดภัยบนอุปกรณ์ของคุณ"
+sv-SE,AeroPulse: Luft & Löparradar,"PM2.5 luftkvalitet, pollen, UV-index och optimala utomhusfönster för löpning.","AeroPulse är en miljö- och luftradar för löpare, cyklister, föräldrar och allergiker.
+
+FUNKTIONER:
+• Smart Go / No-Go poäng mellan 0 och 100
+• 24-timmars tidslinje för PM2.5, temperatur och UV
+• Anpassade profiler för löpning, allergi och familj
+• Pollenradar för gräs och björk
+• Omfattande luftmatris med AQI och ozon
+• Soluppgång, solnedgång och gyllene timmen
+• NOAA rymdväder och geomagnetiskt Kp-index
+• Förhandsvisning för Wear OS smartklockor
+Data sparas lokalt för maximal integritet."
+uk-UA,AeroPulse: Радар Повітря,"Якість повітря PM2.5, пилок, УФ-індекс та безпечний час для пробіжки.","AeroPulse — це інтелектуальний радар чистоти повітря для бігунів, батьків та людей з алергією.
+
+ОСНОВНІ МОЖЛИВОСТІ:
+• Оцінка безпеки Go / No-Go від 0 до 100
+• 24-годинний погодинний графік викидів PM2.5 та УФ
+• Спеціальні профілі для бігу, алергії та дітей
+• Ботанічний радар пилку трав і дерев
+• Матриця чистоти повітря: PM2.5, PM10, AQI та озон
+• Схід, захід сонця та золота година для тренувань
+• Космічна погода NOAA та Kp-індекс для GPS-годинників
+• Симулятор циферблата та плитки Wear OS
+Повна конфіденційність без реєстрації."

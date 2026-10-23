@@ -1,0 +1,141 @@
+<resources>
+    <!-- App Identity -->
+    <string name="app_name">AeroPulse</string>
+    <string name="app_subtitle">BREATH, ALLERGY &amp; RUNNER RADAR</string>
+    <string name="app_tagline">Environmental &amp; Celestial Radar for Outdoor Endurance</string>
+
+    <!-- Navigation -->
+    <string name="nav_run_radar">Run Radar</string>
+    <string name="nav_wear_os_preview">Wear OS Preview</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_calibrating">Calibrating atmospheric &amp; solar telemetry…</string>
+    <string name="splash_ready">Radar synchronized • System ready</string>
+
+    <!-- Location & Search -->
+    <string name="radar_locations_title">RADAR LOCATIONS</string>
+    <string name="search_city_placeholder">Search city (e.g. Chamonix, Boston, London)…</string>
+    <string name="use_gps_title">USE REAL-TIME GPS RADAR</string>
+    <string name="use_gps_desc">Auto-detect atmospheric data at current coordinates</string>
+    <string name="search_results_title">SEARCH RESULTS</string>
+    <string name="saved_favorite_spots_title">SAVED FAVORITE SPOTS</string>
+    <string name="retry_scan_button">RETRY SCAN</string>
+    <string name="atmospheric_feed_unavailable">Atmospheric Feed Unavailable</string>
+    <string name="fetching_telemetry">FETCHING ATMOSPHERIC &amp; SOLAR TELEMETRY…</string>
+    <string name="offline_cache_prefix">OFFLINE RADAR CACHE: Displaying verified baseline data for %1$s</string>
+    <string name="location_permission_denied">Location permission denied. You can search any city manually.</string>
+    <string name="acquired_gps_toast">Acquired atmospheric radar for %1$s</string>
+    <string name="gps_not_ready">GPS signal not ready. Using selected city.</string>
+    <string name="unable_to_get_gps">Unable to get GPS location.</string>
+
+    <!-- User Profiles -->
+    <string name="profile_runner_title">Runner / Athlete</string>
+    <string name="profile_runner_sub">Aerobic ventilation: High PM2.5 &amp; Ozone sensitivity</string>
+    <string name="profile_allergy_title">Allergy &amp; Asthma</string>
+    <string name="profile_allergy_sub">Respiratory focus: Extreme grass &amp; ragweed sensitivity</string>
+    <string name="profile_parent_title">Parent &amp; Stroller</string>
+    <string name="profile_parent_sub">Child safety: Strict UV solar limits &amp; ground PM2.5</string>
+    <string name="profile_pet_title">Pet Walker</string>
+    <string name="profile_pet_sub">Pavement safety: Midday heat, UV &amp; low-ground dust</string>
+
+    <!-- Verdict Dial -->
+    <string name="verdict_go_label">OPTIMAL WINDOW • GO</string>
+    <string name="verdict_go_short">GO</string>
+    <string name="verdict_caution_label">MODERATE • PROCEED WITH CAUTION</string>
+    <string name="verdict_caution_short">CAUTION</string>
+    <string name="verdict_no_go_label">HAZARDOUS • NO-GO OUTDOORS</string>
+    <string name="verdict_no_go_short">NO-GO</string>
+    <string name="aeropulse_index">AEROPULSE INDEX</string>
+    <string name="primary_factor_header">PRIMARY FACTOR</string>
+    <string name="safe_window_title">SAFE WINDOW</string>
+
+    <!-- 24-Hour Hourly Timeline -->
+    <string name="hourly_radar_window_title">24-HOUR RADAR WINDOW</string>
+    <string name="hourly_points_format">%1$s • %2$d PTS</string>
+    <string name="ug_m3_unit">µg/m³</string>
+    <string name="uv_prefix">UV %1$.1f</string>
+
+    <!-- Botanical Pollen Radar -->
+    <string name="botanical_pollen_radar_title">BOTANICAL POLLEN RADAR</string>
+    <string name="dominant_allergen_format">Dominant Allergen: %1$s</string>
+    <string name="grains_per_m3">%1$d grains/m³</string>
+    <string name="pollen_grass">Grass Pollen (Poaceae)</string>
+    <string name="pollen_ragweed">Ragweed (Ambrosia)</string>
+    <string name="pollen_birch">Birch Pollen (Betula)</string>
+    <string name="pollen_alder">Alder Pollen (Alnus)</string>
+    <string name="risk_low">Low Risk</string>
+    <string name="risk_moderate">Moderate</string>
+    <string name="risk_high">High</string>
+    <string name="risk_severe">Severe</string>
+
+    <!-- Air Purity Matrix -->
+    <string name="air_purity_matrix_title">AIR PURITY MATRIX</string>
+    <string name="us_aqi_format">US AQI: %1$d</string>
+    <string name="european_aqi_format">European AQI: %1$d</string>
+    <string name="pm25_particles">PM2.5 PARTICLES</string>
+    <string name="pm10_inhalable">PM10 INHALABLE</string>
+    <string name="ozone_o3">OZONE (O3)</string>
+    <string name="nitrogen_dioxide">NITROGEN DIOXIDE</string>
+    <string name="dust_format">Aerosol Dust: %1$.1f µg/m³</string>
+    <string name="clean_status">Clean</string>
+    <string name="moderate_status">Moderate</string>
+    <string name="elevated_status">Elevated</string>
+    <string name="nominal_status">Nominal</string>
+    <string name="optimal_status">Optimal</string>
+    <string name="lung_irritant_status">Lung Irritant</string>
+    <string name="traffic_load_status">Traffic Load</string>
+
+    <!-- Solar & Celestial -->
+    <string name="solar_uv_celestial_title">SOLAR UV &amp; CELESTIAL ARC</string>
+    <string name="uv_low">Low (0-2)</string>
+    <string name="uv_extreme">Extreme (11+)</string>
+    <string name="peak_uv_format">Peak UV %1$.1f at %2$s</string>
+    <string name="sunrise_golden_title">SUNRISE / GOLDEN</string>
+    <string name="sunset_dusk_title">SUNSET / DUSK</string>
+
+    <!-- Space Weather -->
+    <string name="noaa_space_weather_title">NOAA SPACE WEATHER &amp; KP</string>
+    <string name="planetary_kp_index">PLANETARY KP-INDEX</string>
+    <string name="kp_scale_suffix">/ 9.0</string>
+    <string name="outdoor_gps_telemetry_title">OUTDOOR GPS &amp; WEARABLE TELEMETRY</string>
+
+    <!-- Wear OS Companion -->
+    <string name="wear_os_companion_title">WEAR OS COMPANION</string>
+    <string name="watch_face_tab">Watch Face</string>
+    <string name="wrist_tile_tab">Wrist Tile</string>
+    <string name="wear_os_watch_face_desc">Interactive Wear OS Watch Face featuring continuous halo score ring and live complications</string>
+    <string name="wear_os_tile_desc">Interactive Wear OS Quick Tile for high-speed wrist glances before outdoor activities</string>
+    <string name="aeropulse_tile_label">AEROPULSE TILE</string>
+    <string name="wrist_sync_button">Sync</string>
+
+    <!-- Accessibility Content Descriptions -->
+    <string name="cd_close">Close</string>
+    <string name="cd_clear">Clear</string>
+    <string name="cd_gps">GPS Location</string>
+    <string name="cd_delete">Delete</string>
+    <string name="cd_location">Location</string>
+    <string name="cd_select">Select</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_refresh">Refresh</string>
+    <string name="cd_privacy_policy">Privacy Policy</string>
+    <string name="cd_share_window">Share Window</string>
+
+    <!-- Smart Engagement Dialogs -->
+    <string name="rate_dialog_title">Rate AeroPulse</string>
+    <string name="rate_dialog_message">Are you finding cleaner outdoor windows with AeroPulse? A quick review helps other runners, parents, and allergy sufferers discover clean air windows!</string>
+    <string name="rate_dialog_btn_rate">Rate on Google Play</string>
+    <string name="rate_dialog_btn_later">Remind Me Later</string>
+    <string name="rate_dialog_btn_no_thanks">No Thanks</string>
+
+    <string name="share_dialog_title">Share Safe Window</string>
+    <string name="share_dialog_message">Found an optimal running or walking window? Share live air quality, UV, and allergen radar with friends and training partners.</string>
+    <string name="share_dialog_btn_share">Share with Friends</string>
+
+    <string name="update_dialog_title">AeroPulse Update Available</string>
+    <string name="update_dialog_message">A fresh version of AeroPulse is available with updated botanical pollen models and NOAA planetary storm calibrations.</string>
+    <string name="update_dialog_btn_update">Update on Google Play</string>
+
+    <string name="privacy_policy_title">Privacy Policy</string>
+    <string name="privacy_policy_btn_close">I Understand</string>
+    <string name="privacy_policy_content">AeroPulse Privacy Commitment\n\n1. Location Data: AeroPulse requests precise or approximate location strictly to query Open-Meteo air quality and weather forecasts for your current geographical area. Your location is processed in real time and is never transmitted to advertising trackers or stored on external servers.\n\n2. On-Device Storage: Saved favorite spots and profile sensitivities are stored strictly on your local device using Android Room Database. No account creation or personal login is required.\n\n3. Third-Party Data Sources: Meteorological, particulate matter (PM2.5, PM10, ozone), and botanical pollen forecasts are provided by the Open-Meteo Air Quality API. Planetary geomagnetic Kp-index telemetry is provided by NOAA Space Weather Prediction Center feeds.\n\n4. Data Sharing &amp; Analytics: We do not sell, rent, or monetize your personal information or movement traces.\n\n5. Contact: For privacy questions or assistance, reach out via tuyenctbk@gmail.com.</string>
+</resources>
