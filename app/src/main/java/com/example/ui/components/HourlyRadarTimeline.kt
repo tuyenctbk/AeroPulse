@@ -221,7 +221,11 @@ fun HourlyRadarTimeline(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = activePoint.limitingFactor,
+                            text = if (activePoint.limitingFactorArg != null) {
+                                stringResource(activePoint.limitingFactorRes, activePoint.limitingFactorArg)
+                            } else {
+                                stringResource(activePoint.limitingFactorRes)
+                            },
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = TextWhite,
                                 fontWeight = FontWeight.Medium

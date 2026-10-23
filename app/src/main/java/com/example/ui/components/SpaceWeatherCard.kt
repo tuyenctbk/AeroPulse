@@ -102,7 +102,7 @@ fun SpaceWeatherCard(
                     border = androidx.compose.foundation.BorderStroke(1.dp, kpColor)
                 ) {
                     Text(
-                        text = spaceWeather.stormScale,
+                        text = stringResource(spaceWeather.scaleRes),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
@@ -161,7 +161,7 @@ fun SpaceWeatherCard(
                     horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = spaceWeather.statusText,
+                        text = stringResource(spaceWeather.statusRes),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = TextWhite
@@ -170,7 +170,7 @@ fun SpaceWeatherCard(
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                     Text(
-                        text = spaceWeather.auroraProspects,
+                        text = stringResource(spaceWeather.auroraRes),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = TextMuted,
                             fontSize = 10.sp
@@ -226,7 +226,7 @@ fun SpaceWeatherCard(
                             )
                         )
                         Text(
-                            text = spaceWeather.techGpsStatus,
+                            text = stringResource(spaceWeather.techRes),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = TextWhite,
                                 fontWeight = FontWeight.Medium

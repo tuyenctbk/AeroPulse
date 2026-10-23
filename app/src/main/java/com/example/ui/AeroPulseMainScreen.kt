@@ -284,8 +284,9 @@ fun AeroPulseMainScreen(
                     val loc = uiState.activeLocation.name
                     val telemetry = (uiState.telemetryState as? TelemetryUiState.Success)?.data
                     val score = telemetry?.verdict?.score ?: 88
-                    val label = telemetry?.verdict?.level?.shortLabel ?: "Optimal"
-                    val shareText = "AeroPulse Atmospheric Radar for $loc: Score $score/100 ($label). Safe outdoor window verified!"
+                    val label = telemetry?.verdict?.level?.let { stringResource(it.shortLabelRes) }
+                        ?: stringResource(R.string.optimal_status)
+                    val shareText = stringResource(R.string.share_summary_text, loc, score, label)
                     ShareAppDialog(
                         shareText = shareText,
                         onShare = { viewModel.onShareNow(it) },

@@ -149,7 +149,11 @@ fun VerdictDialCard(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = verdict.bestWindowSpan,
+                        text = if (verdict.bestWindowArg != null) {
+                            stringResource(verdict.bestWindowRes, verdict.bestWindowArg)
+                        } else {
+                            stringResource(verdict.bestWindowRes)
+                        },
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = TextWhite,
                             fontWeight = FontWeight.Medium
@@ -296,7 +300,11 @@ fun VerdictDialCard(
                             )
                         )
                         Text(
-                            text = verdict.primaryLimitingFactor,
+                            text = if (verdict.factorArg != null) {
+                                stringResource(verdict.factorRes, verdict.factorArg)
+                            } else {
+                                stringResource(verdict.factorRes)
+                            },
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = TextWhite,
                                 fontWeight = FontWeight.Medium
@@ -310,7 +318,11 @@ fun VerdictDialCard(
 
             // Actionable advice text
             Text(
-                text = verdict.actionableTip,
+                text = if (verdict.actionableTipArgs.isNotEmpty()) {
+                    stringResource(verdict.actionableTipRes, *verdict.actionableTipArgs.toTypedArray())
+                } else {
+                    stringResource(verdict.actionableTipRes)
+                },
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = TextMuted,
                     lineHeight = 18.sp,

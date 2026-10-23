@@ -98,10 +98,17 @@ enum class VerdictLevel(
 data class OutdoorVerdict(
     val level: VerdictLevel,
     val score: Int,                    // 0 (hazardous) to 100 (pristine)
-    val headline: String,
-    val primaryLimitingFactor: String,
-    val bestWindowSpan: String,
-    val actionableTip: String
+    @StringRes val headlineRes: Int = R.string.headline_optimal_flow,
+    val headline: String = "",
+    @StringRes val factorRes: Int = R.string.factor_clean_air,
+    val factorArg: Any? = null,
+    val primaryLimitingFactor: String = "",
+    @StringRes val bestWindowRes: Int = R.string.window_continuous_favorable,
+    val bestWindowArg: String? = null,
+    val bestWindowSpan: String = "",
+    @StringRes val actionableTipRes: Int = R.string.tip_runner_optimal,
+    val actionableTipArgs: List<Any> = emptyList(),
+    val actionableTip: String = ""
 )
 
 data class HourlyRadarPoint(
@@ -113,7 +120,9 @@ data class HourlyRadarPoint(
     val temperatureC: Double,
     val score: Int,
     val level: VerdictLevel,
-    val limitingFactor: String
+    @StringRes val limitingFactorRes: Int = R.string.factor_clean_air,
+    val limitingFactorArg: Any? = null,
+    val limitingFactor: String = ""
 )
 
 data class PollenTelemetry(
@@ -121,8 +130,10 @@ data class PollenTelemetry(
     val ragweedPollen: Double,
     val birchPollen: Double,
     val alderPollen: Double,
-    val dominantSpecies: String,
-    val riskLevel: String,
+    @StringRes val dominantSpeciesRes: Int = R.string.species_grass,
+    val dominantSpecies: String = "",
+    @StringRes val riskLevelRes: Int = R.string.risk_low,
+    val riskLevel: String = "",
     val riskColor: Color
 )
 
@@ -138,10 +149,14 @@ data class SolarTelemetry(
 
 data class SpaceWeatherTelemetry(
     val kpIndex: Double,
-    val stormScale: String,
-    val statusText: String,
-    val auroraProspects: String,
-    val techGpsStatus: String
+    @StringRes val scaleRes: Int = R.string.sw_scale_g0_quiet,
+    val stormScale: String = "",
+    @StringRes val statusRes: Int = R.string.sw_status_quiet,
+    val statusText: String = "",
+    @StringRes val auroraRes: Int = R.string.sw_aurora_quiet,
+    val auroraProspects: String = "",
+    @StringRes val techRes: Int = R.string.sw_tech_quiet,
+    val techGpsStatus: String = ""
 )
 
 data class AirPurityMetrics(

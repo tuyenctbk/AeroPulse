@@ -395,7 +395,7 @@ private fun WatchFaceContent(
                     )
                     Spacer(modifier = Modifier.width(3.dp))
                     Text(
-                        text = telemetry.pollen.riskLevel,
+                        text = stringResource(telemetry.pollen.riskLevelRes),
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontSize = 8.5.sp,
                             color = TextWhite
@@ -451,7 +451,11 @@ private fun WatchTileContent(
             color = Color(0xFF101B2B)
         ) {
             Text(
-                text = verdict.bestWindowSpan,
+                text = if (verdict.bestWindowArg != null) {
+                    stringResource(verdict.bestWindowRes, verdict.bestWindowArg)
+                } else {
+                    stringResource(verdict.bestWindowRes)
+                },
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                 style = MaterialTheme.typography.labelSmall.copy(
                     fontSize = 9.sp,
@@ -464,7 +468,11 @@ private fun WatchTileContent(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = verdict.primaryLimitingFactor,
+            text = if (verdict.factorArg != null) {
+                stringResource(verdict.factorRes, verdict.factorArg)
+            } else {
+                stringResource(verdict.factorRes)
+            },
             style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 9.5.sp,
                 color = TextMuted,

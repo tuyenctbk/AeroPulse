@@ -883,6 +883,18 @@ LANGUAGES = {
     }
 }
 
+import xml.etree.ElementTree as ET
+
+base_strings_file = "app/src/main/res/values/strings.xml"
+base_tree = ET.parse(base_strings_file)
+base_root = base_tree.getroot()
+
+base_map = {}
+for elem in base_root.findall("string"):
+    name = elem.get("name")
+    if name:
+        base_map[name] = elem.text or ""
+
 base_res = "app/src/main/res"
 
 for lang_code, trans in LANGUAGES.items():
@@ -891,11 +903,12 @@ for lang_code, trans in LANGUAGES.items():
     out_file = os.path.join(folder, "strings.xml")
     
     xml_lines = ['<resources>']
-    xml_lines.append('    <string name="app_name">AeroPulse</string>')
     
-    for key, value in trans.items():
-        escaped_val = value.replace("&", "&amp;").replace("'", "\\'").replace('"', '\\"')
-        xml_lines.append(f'    <string name="{key}">{escaped_val}</string>')
+    # Merge keys: explicitly translated ones take precedence, base ones as fallback
+    for name, base_val in base_map.items():
+        val = trans.get(name, base_val)
+        escaped_val = val.replace("&", "&amp;").replace("'", "\\'").replace('"', '\\"')
+        xml_lines.append(f'    <string name="{name}">{escaped_val}</string>')
         
     xml_lines.append('</resources>')
     
@@ -903,4 +916,4 @@ for lang_code, trans in LANGUAGES.items():
         f.write('\n'.join(xml_lines) + '\n')
     print(f"Generated {out_file}")
 
-print("All 20 localized strings.xml files generated successfully!")
+print("All 20 localized strings.xml files generated successfully with full key coverage!")

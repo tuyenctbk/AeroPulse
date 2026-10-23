@@ -96,7 +96,7 @@ fun PollenRadarCard(
                     border = androidx.compose.foundation.BorderStroke(1.dp, pollen.riskColor)
                 ) {
                     Text(
-                        text = pollen.riskLevel.uppercase(),
+                        text = stringResource(pollen.riskLevelRes).uppercase(),
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
@@ -109,7 +109,7 @@ fun PollenRadarCard(
 
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = stringResource(R.string.dominant_allergen_format, pollen.dominantSpecies),
+                text = stringResource(R.string.dominant_allergen_format, stringResource(pollen.dominantSpeciesRes)),
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = TextMuted
                 )

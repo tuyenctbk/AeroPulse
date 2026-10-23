@@ -1,6 +1,8 @@
 package com.example.domain
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import com.example.R
 import com.example.data.model.AirQualityResponse
 import com.example.data.model.NoaaKpItem
 import com.example.data.model.WeatherResponse
@@ -9,6 +11,25 @@ import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+
+data class ScoreFactor(
+    @StringRes val resId: Int,
+    val arg: Any?,
+    val fallbackString: String,
+    val weight: Double
+)
+
+data class WindowSpan(
+    @StringRes val resId: Int,
+    val arg: String?,
+    val displaySpan: String
+)
+
+data class ActionAdvice(
+    @StringRes val resId: Int,
+    val args: List<Any>,
+    val fallbackString: String
+)
 
 object GoNoGoEngine {
 
@@ -121,7 +142,9 @@ object GoNoGoEngine {
                     temperatureC = hTemp,
                     score = hScore,
                     level = hLevel,
-                    limitingFactor = hFactor
+                    limitingFactorRes = hFactor.resId,
+                    limitingFactorArg = hFactor.arg,
+                    limitingFactor = hFactor.fallbackString
                 )
             )
         }
@@ -146,19 +169,33 @@ object GoNoGoEngine {
 
         val bestWindow = findBestWindow(hourlyRadar)
         val actionableTip = generateActionableAdvice(profile, currentLevel, currentLimitingFactor, bestWindow)
-        val headline = when (currentLevel) {
-            VerdictLevel.OPTIMAL_GO -> "Clean atmospheric flow. Ideal conditions for outdoor ${profile.title.lowercase()} activities."
-            VerdictLevel.MODERATE_CAUTION -> "Moderate environmental load detected. ${currentLimitingFactor}."
-            VerdictLevel.HAZARDOUS_NO_GO -> "Adverse conditions detected. High ${currentLimitingFactor}. Limit strenuous outdoor exposure."
+        
+        val headlineRes = when (currentLevel) {
+            VerdictLevel.OPTIMAL_GO -> R.string.headline_optimal_flow
+            VerdictLevel.MODERATE_CAUTION -> R.string.headline_moderate_load
+            VerdictLevel.HAZARDOUS_NO_GO -> R.string.headline_hazardous_adverse
+        }
+
+        val headlineFallback = when (currentLevel) {
+            VerdictLevel.OPTIMAL_GO -> "Clean atmospheric flow. Ideal conditions for outdoor activities."
+            VerdictLevel.MODERATE_CAUTION -> "Moderate environmental load detected."
+            VerdictLevel.HAZARDOUS_NO_GO -> "Adverse conditions detected. Limit strenuous outdoor exposure."
         }
 
         val verdict = OutdoorVerdict(
             level = currentLevel,
             score = currentScore,
-            headline = headline,
-            primaryLimitingFactor = currentLimitingFactor,
-            bestWindowSpan = bestWindow,
-            actionableTip = actionableTip
+            headlineRes = headlineRes,
+            headline = headlineFallback,
+            factorRes = currentLimitingFactor.resId,
+            factorArg = currentLimitingFactor.arg,
+            primaryLimitingFactor = currentLimitingFactor.fallbackString,
+            bestWindowRes = bestWindow.resId,
+            bestWindowArg = bestWindow.arg,
+            bestWindowSpan = bestWindow.displaySpan,
+            actionableTipRes = actionableTip.resId,
+            actionableTipArgs = actionableTip.args,
+            actionableTip = actionableTip.fallbackString
         )
 
         return AeroPulseTelemetry(
@@ -189,15 +226,23 @@ object GoNoGoEngine {
         temp: Double,
         grass: Double,
         ragweed: Double
-    ): Pair<Int, String> {
+    ): Pair<Int, ScoreFactor> {
         var penalty = 0.0
-        val penalties = mutableListOf<Pair<String, Double>>()
+        val penalties = mutableListOf<ScoreFactor>()
 
         // PM2.5 Penalty (heavier weight for runners and allergy)
         val pm25Excess = max(0.0, pm25 - profile.pm25Sensitivity)
         val pm25Penalty = pm25Excess * 2.8
         if (pm25Penalty > 5.0) {
-            penalties.add("PM2.5 spike (${pm25.roundToInt()} µg/m³)" to pm25Penalty)
+            val rounded = pm25.roundToInt()
+            penalties.add(
+                ScoreFactor(
+                    resId = R.string.factor_pm25_spike,
+                    arg = rounded,
+                    fallbackString = "PM2.5 spike ($rounded µg/m³)",
+                    weight = pm25Penalty
+                )
+            )
         }
         penalty += pm25Penalty
 
@@ -205,7 +250,15 @@ object GoNoGoEngine {
         val o3Excess = max(0.0, ozone - profile.ozoneSensitivity)
         val o3Penalty = o3Excess * 0.7
         if (o3Penalty > 5.0) {
-            penalties.add("Elevated ground ozone (${ozone.roundToInt()} µg/m³)" to o3Penalty)
+            val rounded = ozone.roundToInt()
+            penalties.add(
+                ScoreFactor(
+                    resId = R.string.factor_ozone_elevated,
+                    arg = rounded,
+                    fallbackString = "Elevated ground ozone ($rounded µg/m³)",
+                    weight = o3Penalty
+                )
+            )
         }
         penalty += o3Penalty
 
@@ -215,8 +268,16 @@ object GoNoGoEngine {
         val pollenMultiplier = if (profile == UserProfile.ALLERGY_SUFFERER) 3.5 else 1.2
         val pollenPenalty = pollenExcess * pollenMultiplier
         if (pollenPenalty > 5.0) {
-            val allergen = if (grass >= ragweed) "Grass pollen" else "Ragweed pollen"
-            penalties.add("$allergen count (${maxPollen.roundToInt()} gr/m³)" to pollenPenalty)
+            val rounded = maxPollen.roundToInt()
+            val isGrass = grass >= ragweed
+            penalties.add(
+                ScoreFactor(
+                    resId = if (isGrass) R.string.factor_grass_pollen else R.string.factor_ragweed_pollen,
+                    arg = rounded,
+                    fallbackString = if (isGrass) "Grass pollen count ($rounded gr/m³)" else "Ragweed pollen count ($rounded gr/m³)",
+                    weight = pollenPenalty
+                )
+            )
         }
         penalty += pollenPenalty
 
@@ -229,7 +290,15 @@ object GoNoGoEngine {
         }
         val uvPenalty = uvExcess * uvMultiplier
         if (uvPenalty > 5.0) {
-            penalties.add("High UV solar index (${"%.1f".format(uv)})" to uvPenalty)
+            val uvFormatted = "%.1f".format(uv)
+            penalties.add(
+                ScoreFactor(
+                    resId = R.string.factor_high_uv,
+                    arg = uvFormatted,
+                    fallbackString = "High UV solar index ($uvFormatted)",
+                    weight = uvPenalty
+                )
+            )
         }
         penalty += uvPenalty
 
@@ -237,61 +306,121 @@ object GoNoGoEngine {
         val tempExcess = max(0.0, temp - profile.tempMaxComfort)
         val tempPenalty = tempExcess * 2.5
         if (tempPenalty > 5.0) {
-            val issue = if (profile == UserProfile.PET_WALKER) "Hot pavement heat" else "High ambient heat"
-            penalties.add("$issue (${temp.roundToInt()}°C)" to tempPenalty)
+            val rounded = temp.roundToInt()
+            val isPet = profile == UserProfile.PET_WALKER
+            penalties.add(
+                ScoreFactor(
+                    resId = if (isPet) R.string.factor_hot_pavement else R.string.factor_high_heat,
+                    arg = rounded,
+                    fallbackString = if (isPet) "Hot pavement heat ($rounded°C)" else "High ambient heat ($rounded°C)",
+                    weight = tempPenalty
+                )
+            )
         }
         penalty += tempPenalty
 
         val finalScore = max(5, min(100, (100 - penalty).roundToInt()))
-        val topFactor = penalties.maxByOrNull { it.second }?.first ?: "Favorable clean air"
+        val topFactor = penalties.maxByOrNull { it.weight } ?: ScoreFactor(
+            resId = R.string.factor_clean_air,
+            arg = null,
+            fallbackString = "Favorable clean air",
+            weight = 0.0
+        )
 
         return Pair(finalScore, topFactor)
     }
 
-    private fun findBestWindow(points: List<HourlyRadarPoint>): String {
-        if (points.isEmpty()) return "Continuous favorable window"
+    private fun findBestWindow(points: List<HourlyRadarPoint>): WindowSpan {
+        if (points.isEmpty()) {
+            return WindowSpan(
+                resId = R.string.window_continuous_favorable,
+                arg = null,
+                displaySpan = "Continuous favorable window"
+            )
+        }
         val optimalHours = points.filter { it.score >= 70 }
         if (optimalHours.isEmpty()) {
             val bestPoint = points.maxByOrNull { it.score }
-            return bestPoint?.displayHour?.let { "Marginal window around $it" } ?: "No optimal window today"
+            return if (bestPoint != null) {
+                WindowSpan(
+                    resId = R.string.window_marginal_at,
+                    arg = bestPoint.displayHour,
+                    displaySpan = "Marginal window around ${bestPoint.displayHour}"
+                )
+            } else {
+                WindowSpan(
+                    resId = R.string.window_none_today,
+                    arg = null,
+                    displaySpan = "No optimal window today"
+                )
+            }
         }
         val first = optimalHours.first().displayHour
         val last = optimalHours.last().displayHour
-        return "$first - $last"
+        val spanStr = "$first - $last"
+        return WindowSpan(
+            resId = R.string.window_time_range,
+            arg = spanStr,
+            displaySpan = spanStr
+        )
     }
 
     private fun generateActionableAdvice(
         profile: UserProfile,
         level: VerdictLevel,
-        limitingFactor: String,
-        bestWindow: String
-    ): String {
+        limitingFactor: ScoreFactor,
+        bestWindow: WindowSpan
+    ): ActionAdvice {
         return when (level) {
             VerdictLevel.OPTIMAL_GO -> when (profile) {
-                UserProfile.RUNNER -> "Ideal VO2 max ventilation. Perfect for tempo runs or long endurance workouts."
-                UserProfile.ALLERGY_SUFFERER -> "Low pollen suspension and clear airways. Great window for outdoor activities without mask."
-                UserProfile.PARENT_STROLLER -> "Safe UV index and clean low-ground air for strollers and playground games."
-                UserProfile.PET_WALKER -> "Cool asphalt and clean air. Safe for vigorous leash walks and dog park games."
+                UserProfile.RUNNER -> ActionAdvice(
+                    resId = R.string.tip_runner_optimal,
+                    args = emptyList(),
+                    fallbackString = "Ideal VO2 max ventilation. Perfect for tempo runs or long endurance workouts."
+                )
+                UserProfile.ALLERGY_SUFFERER -> ActionAdvice(
+                    resId = R.string.tip_allergy_optimal,
+                    args = emptyList(),
+                    fallbackString = "Low pollen suspension and clear airways. Great window for outdoor activities without mask."
+                )
+                UserProfile.PARENT_STROLLER -> ActionAdvice(
+                    resId = R.string.tip_parent_optimal,
+                    args = emptyList(),
+                    fallbackString = "Safe UV index and clean low-ground air for strollers and playground games."
+                )
+                UserProfile.PET_WALKER -> ActionAdvice(
+                    resId = R.string.tip_pet_optimal,
+                    args = emptyList(),
+                    fallbackString = "Cool asphalt and clean air. Safe for vigorous leash walks and dog park games."
+                )
             }
-            VerdictLevel.MODERATE_CAUTION -> "Target the best window ($bestWindow). Watch for $limitingFactor; stay hydrated and monitor breathing."
-            VerdictLevel.HAZARDOUS_NO_GO -> "Shift workout or activities indoors. Strenuous outdoor exertion during $limitingFactor may cause respiratory stress."
+            VerdictLevel.MODERATE_CAUTION -> ActionAdvice(
+                resId = R.string.tip_moderate_caution,
+                args = listOf(bestWindow.displaySpan, limitingFactor.fallbackString),
+                fallbackString = "Target the best window (${bestWindow.displaySpan}). Watch for ${limitingFactor.fallbackString}; stay hydrated and monitor breathing."
+            )
+            VerdictLevel.HAZARDOUS_NO_GO -> ActionAdvice(
+                resId = R.string.tip_hazardous_no_go,
+                args = listOf(limitingFactor.fallbackString),
+                fallbackString = "Shift workout or activities indoors. Strenuous outdoor exertion during ${limitingFactor.fallbackString} may cause respiratory stress."
+            )
         }
     }
 
     private fun calculatePollen(grass: Double, ragweed: Double, birch: Double, alder: Double): PollenTelemetry {
         val maxVal = max(max(grass, ragweed), max(birch, alder))
-        val dominant = when {
-            grass >= ragweed && grass >= birch && grass >= alder -> "Grass (Poaceae)"
-            ragweed >= grass && ragweed >= birch && ragweed >= alder -> "Ragweed (Ambrosia)"
-            birch >= grass && birch >= ragweed && birch >= alder -> "Birch (Betula)"
-            else -> "Alder (Alnus)"
+        val (dominantRes, dominantFallback) = when {
+            grass >= ragweed && grass >= birch && grass >= alder -> R.string.species_grass to "Grass (Poaceae)"
+            ragweed >= grass && ragweed >= birch && ragweed >= alder -> R.string.species_ragweed to "Ragweed (Ambrosia)"
+            birch >= grass && birch >= ragweed && birch >= alder -> R.string.species_birch to "Birch (Betula)"
+            else -> R.string.species_alder to "Alder (Alnus)"
         }
 
-        val (risk, color) = when {
-            maxVal < 8.0 -> "Low Risk" to Color(0xFF10B981)
-            maxVal < 25.0 -> "Moderate" to Color(0xFFF59E0B)
-            maxVal < 60.0 -> "High" to Color(0xFFF97316)
-            else -> "Severe" to Color(0xFFEF4444)
+        val (riskRes, riskFallback, color) = when {
+            maxVal < 8.0 -> Triple(R.string.risk_low, "Low Risk", Color(0xFF10B981))
+            maxVal < 25.0 -> Triple(R.string.risk_moderate, "Moderate", Color(0xFFF59E0B))
+            maxVal < 60.0 -> Triple(R.string.risk_high, "High", Color(0xFFF97316))
+            else -> Triple(R.string.risk_severe, "Severe", Color(0xFFEF4444))
         }
 
         return PollenTelemetry(
@@ -299,8 +428,10 @@ object GoNoGoEngine {
             ragweedPollen = ragweed,
             birchPollen = birch,
             alderPollen = alder,
-            dominantSpecies = dominant,
-            riskLevel = risk,
+            dominantSpeciesRes = dominantRes,
+            dominantSpecies = dominantFallback,
+            riskLevelRes = riskRes,
+            riskLevel = riskFallback,
             riskColor = color
         )
     }
@@ -323,49 +454,58 @@ object GoNoGoEngine {
     }
 
     private fun calculateSpaceWeather(kp: Double): SpaceWeatherTelemetry {
-        val (scale, status, aurora, tech) = when {
-            kp < 4.0 -> Quad(
-                "G0 (Quiet)",
-                "Quiet Geomagnetic Field",
-                "Aurora only visible near poles (65°+ N/S)",
-                "GPS, smartwatches & outdoor cellular telemetry nominal"
+        val (scaleRes, scale, statusRes, status, auroraRes, aurora, techRes, tech) = when {
+            kp < 4.0 -> Octet(
+                R.string.sw_scale_g0_quiet, "G0 (Quiet)",
+                R.string.sw_status_quiet, "Quiet Geomagnetic Field",
+                R.string.sw_aurora_quiet, "Aurora only visible near poles (65°+ N/S)",
+                R.string.sw_tech_quiet, "GPS, smartwatches & outdoor cellular telemetry nominal"
             )
-            kp < 5.0 -> Quad(
-                "G0 (Unsettled)",
-                "Unsettled Solar Wind",
-                "Aurora possibly visible in high latitudes (58°+ N)",
-                "Minor GNSS high-latitude precision jitter possible"
+            kp < 5.0 -> Octet(
+                R.string.sw_scale_g0_unsettled, "G0 (Unsettled)",
+                R.string.sw_status_unsettled, "Unsettled Solar Wind",
+                R.string.sw_aurora_unsettled, "Aurora possibly visible in high latitudes (58°+ N)",
+                R.string.sw_tech_unsettled, "Minor GNSS high-latitude precision jitter possible"
             )
-            kp < 6.0 -> Quad(
-                "G1 (Minor Storm)",
-                "Minor Geomagnetic Storm",
-                "Aurora visible down to ~55° N (Northern US / UK)",
-                "Weak satellite power grid fluctuations"
+            kp < 6.0 -> Octet(
+                R.string.sw_scale_g1_minor, "G1 (Minor Storm)",
+                R.string.sw_status_g1, "Minor Geomagnetic Storm",
+                R.string.sw_aurora_g1, "Aurora visible down to ~55° N (Northern US / UK)",
+                R.string.sw_tech_g1, "Weak satellite power grid fluctuations"
             )
-            kp < 7.0 -> Quad(
-                "G2 (Moderate Storm)",
-                "Moderate Geomagnetic Storm",
-                "Aurora visible down to ~50° N (New York, Berlin)",
-                "GPS positional drift of 2-5m in open sky"
+            kp < 7.0 -> Octet(
+                R.string.sw_scale_g2_moderate, "G2 (Moderate Storm)",
+                R.string.sw_status_g2, "Moderate Geomagnetic Storm",
+                R.string.sw_aurora_g2, "Aurora visible down to ~50° N (New York, Berlin)",
+                R.string.sw_tech_g2, "GPS positional drift of 2-5m in open sky"
             )
-            else -> Quad(
-                "G3+ (Strong Storm)",
-                "Strong Geomagnetic Disturbance",
-                "Broad visible aurora down to ~45° N",
-                "High frequency radio blackouts & satellite tracking anomalies"
+            else -> Octet(
+                R.string.sw_scale_g3_strong, "G3+ (Strong Storm)",
+                R.string.sw_status_g3, "Strong Geomagnetic Disturbance",
+                R.string.sw_aurora_g3, "Broad visible aurora down to ~45° N",
+                R.string.sw_tech_g3, "High frequency radio blackouts & satellite tracking anomalies"
             )
         }
 
         return SpaceWeatherTelemetry(
             kpIndex = kp,
+            scaleRes = scaleRes,
             stormScale = scale,
+            statusRes = statusRes,
             statusText = status,
+            auroraRes = auroraRes,
             auroraProspects = aurora,
+            techRes = techRes,
             techGpsStatus = tech
         )
     }
 
-    private data class Quad(val first: String, val second: String, val third: String, val fourth: String)
+    private data class Octet(
+        val firstRes: Int, val first: String,
+        val secondRes: Int, val second: String,
+        val thirdRes: Int, val third: String,
+        val fourthRes: Int, val fourth: String
+    )
 
     private fun formatTimeFromIso(iso: String, fallback: String): String {
         return try {
