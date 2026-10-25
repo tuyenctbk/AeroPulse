@@ -211,4 +211,15 @@
     <string name="share_chooser_title">Share Outdoor Window via</string>
     <string name="share_summary_text">AeroPulse Environmental Radar for %1$s: Score %2$d/100 (%3$s). Safe outdoor window verified!</string>
     <string name="pm25_ug_format">%1$d µg</string>
+
+    <!-- App Usage Telemetry Stats -->
+    <string name="usage_stats_title">AeroPulse Usage &amp; Telemetry</string>
+    <string name="usage_sessions_count">Sessions Launched: %1$d</string>
+    <string name="usage_scans_count">Atmospheric Scans: %1$d</string>
+    <string name="usage_days_active">Days Active: %1$d</string>
+    <string name="usage_rating_status">Review Status: %1$s</string>
+    <string name="usage_status_rated">Reviewed</string>
+    <string name="usage_status_pending">Pending</string>
+    <string name="usage_stats_subtitle">Optimized engagement telemetry active</string>
+    <string name="cd_usage_stats">App Usage Stats</string>
 </resources>

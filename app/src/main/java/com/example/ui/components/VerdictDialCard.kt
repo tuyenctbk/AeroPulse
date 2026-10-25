@@ -4,6 +4,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -69,6 +70,12 @@ fun VerdictDialCard(
         targetValue = verdict.score / 100f,
         animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
         label = "verdictProgress"
+    )
+
+    val animatedScore by animateIntAsState(
+        targetValue = verdict.score,
+        animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing),
+        label = "verdictScoreTicker"
     )
 
     // Breathing pulse animation for active dial halo
@@ -208,6 +215,25 @@ fun VerdictDialCard(
                         useCenter = false,
                         style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
                     )
+
+                    // Aeronautical radar tick marks around inner rim
+                    val tickCount = 20
+                    for (i in 0..tickCount) {
+                        val angle = startAngle + (sweepAngle / tickCount) * i
+                        val rad = Math.toRadians(angle.toDouble())
+                        val innerR = (size.minDimension / 2f) - strokeWidth - 6.dp.toPx()
+                        val outerR = innerR + 3.dp.toPx()
+                        val startX = center.x + (innerR * kotlin.math.cos(rad)).toFloat()
+                        val startY = center.y + (innerR * kotlin.math.sin(rad)).toFloat()
+                        val endX = center.x + (outerR * kotlin.math.cos(rad)).toFloat()
+                        val endY = center.y + (outerR * kotlin.math.sin(rad)).toFloat()
+                        drawLine(
+                            color = Color(0xFF1E3A5F).copy(alpha = 0.5f),
+                            start = androidx.compose.ui.geometry.Offset(startX, startY),
+                            end = androidx.compose.ui.geometry.Offset(endX, endY),
+                            strokeWidth = 1.2.dp.toPx()
+                        )
+                    }
                 }
 
                 // Score readout & Verdict inside dial
@@ -216,7 +242,7 @@ fun VerdictDialCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "${verdict.score}",
+                        text = "$animatedScore",
                         style = MaterialTheme.typography.displayMedium.copy(
                             fontWeight = FontWeight.Black,
                             fontFamily = FontFamily.Monospace,

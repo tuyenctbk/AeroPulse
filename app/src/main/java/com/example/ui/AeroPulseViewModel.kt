@@ -21,6 +21,8 @@ import com.example.ui.engagement.EngagementDialogType
 import com.example.ui.engagement.EngagementManager
 import kotlinx.coroutines.launch
 
+import com.example.ui.engagement.AppUsageMetrics
+
 enum class AppViewMode {
     DASHBOARD,
     WEAR_OS_WATCH,
@@ -53,7 +55,9 @@ data class AeroPulseUiState(
     val isSearching: Boolean = false,
     val isGpsActive: Boolean = false,
     val activeDialog: EngagementDialogType = EngagementDialogType.NONE,
-    val isPrivacyPolicyOpen: Boolean = false
+    val isPrivacyPolicyOpen: Boolean = false,
+    val isUsageStatsOpen: Boolean = false,
+    val usageMetrics: AppUsageMetrics = AppUsageMetrics(1, 0, 1, false, false, false)
 )
 
 class AeroPulseViewModel(application: Application) : AndroidViewModel(application) {
@@ -78,6 +82,7 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
     private var searchJob: Job? = null
 
     init {
+        _uiState.update { it.copy(usageMetrics = engagementManager.getUsageMetrics()) }
         loadTelemetryForActiveLocation()
     }
 
@@ -206,16 +211,18 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
                     lon = loc.longitude,
                     profile = profile
                 )
-                val suggestedDialog = engagementManager.recordRadarCheck()
+                val suggestedDialog = engagementManager.recordRadarCheck(telemetry.verdict.score)
+                val updatedMetrics = engagementManager.getUsageMetrics()
                 _uiState.update {
                     it.copy(
                         telemetryState = TelemetryUiState.Success(telemetry),
                         isRefreshing = false,
+                        usageMetrics = updatedMetrics,
                         activeDialog = if (it.activeDialog == EngagementDialogType.NONE) suggestedDialog else it.activeDialog
                     )
                 }
                 if (suggestedDialog != EngagementDialogType.NONE) {
-                    engagementManager.markPromptShown()
+                    engagementManager.markPromptShown(suggestedDialog)
                 }
             } catch (e: Exception) {
                 _uiState.update {
@@ -235,17 +242,32 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun onRateNow() {
         engagementManager.onUserRated()
-        _uiState.update { it.copy(activeDialog = EngagementDialogType.NONE) }
+        _uiState.update {
+            it.copy(
+                activeDialog = EngagementDialogType.NONE,
+                usageMetrics = engagementManager.getUsageMetrics()
+            )
+        }
     }
 
     fun onDismissRatingPermanently() {
         engagementManager.onUserDismissedPermanently()
-        _uiState.update { it.copy(activeDialog = EngagementDialogType.NONE) }
+        _uiState.update {
+            it.copy(
+                activeDialog = EngagementDialogType.NONE,
+                usageMetrics = engagementManager.getUsageMetrics()
+            )
+        }
     }
 
     fun onShareNow(shareText: String) {
         engagementManager.onUserShared(shareText)
-        _uiState.update { it.copy(activeDialog = EngagementDialogType.NONE) }
+        _uiState.update {
+            it.copy(
+                activeDialog = EngagementDialogType.NONE,
+                usageMetrics = engagementManager.getUsageMetrics()
+            )
+        }
     }
 
     fun triggerManualShare() {
@@ -263,6 +285,19 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun closePrivacyPolicy() {
         _uiState.update { it.copy(isPrivacyPolicyOpen = false) }
+    }
+
+    fun openUsageStats() {
+        _uiState.update {
+            it.copy(
+                isUsageStatsOpen = true,
+                usageMetrics = engagementManager.getUsageMetrics()
+            )
+        }
+    }
+
+    fun closeUsageStats() {
+        _uiState.update { it.copy(isUsageStatsOpen = false) }
     }
 
     fun triggerUpdateDialogManually() {

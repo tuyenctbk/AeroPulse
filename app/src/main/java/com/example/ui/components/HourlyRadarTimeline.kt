@@ -1,8 +1,12 @@
 package com.example.ui.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -127,9 +131,18 @@ fun HourlyRadarTimeline(
                     val isSelected = index == selectedHourIndex
                     val cardBg = if (isSelected) SurfaceElevated else Color(0xFF0C1322)
                     val borderColor = if (isSelected) AeroCyan else CardBorder
+                    val animatedScale by animateFloatAsState(
+                        targetValue = if (isSelected) 1.05f else 1.0f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessLow
+                        ),
+                        label = "pillarSpring"
+                    )
 
                     Box(
                         modifier = Modifier
+                            .graphicsLayer(scaleX = animatedScale, scaleY = animatedScale)
                             .width(62.dp)
                             .clip(RoundedCornerShape(14.dp))
                             .background(cardBg)

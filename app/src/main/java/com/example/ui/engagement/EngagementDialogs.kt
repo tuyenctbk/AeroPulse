@@ -410,3 +410,121 @@ fun PrivacyPolicyDialog(
         }
     }
 }
+
+@Composable
+fun AppUsageStatsDialog(
+    metrics: AppUsageMetrics,
+    onRateRequested: () -> Unit,
+    onShareRequested: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(24.dp),
+            color = SurfaceDark,
+            border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.usage_stats_title),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = TextWhite
+                        )
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.cd_close),
+                            tint = TextMuted
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Grid of metrics
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(SurfaceElevated)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.usage_sessions_count, metrics.sessionCount),
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextWhite, fontWeight = FontWeight.Medium)
+                        )
+                        Text(
+                            text = stringResource(R.string.usage_scans_count, metrics.radarCheckCount),
+                            style = MaterialTheme.typography.bodySmall.copy(color = AeroCyan, fontWeight = FontWeight.Bold)
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.usage_days_active, metrics.daysSinceFirstLaunch),
+                            style = MaterialTheme.typography.bodySmall.copy(color = TextWhite, fontWeight = FontWeight.Medium)
+                        )
+                        val statusText = if (metrics.hasRated) stringResource(R.string.usage_status_rated) else stringResource(R.string.usage_status_pending)
+                        Text(
+                            text = stringResource(R.string.usage_rating_status, statusText),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = if (metrics.hasRated) Color(0xFF10B981) else Color(0xFFF59E0B),
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = onRateRequested,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.rate_dialog_title),
+                            style = MaterialTheme.typography.labelSmall.copy(color = TextWhite)
+                        )
+                    }
+                    Button(
+                        onClick = onShareRequested,
+                        colors = ButtonDefaults.buttonColors(containerColor = AeroCyan, contentColor = VoidBlack),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.share_dialog_title),
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}

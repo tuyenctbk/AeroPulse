@@ -68,4 +68,32 @@ class ExampleRobolectricTest {
         assertTrue(telemetry.verdict.score >= 80)
         assertEquals(24, telemetry.hourlyRadar.size)
     }
+
+    @Test
+    fun `test engagement manager smart prompt evaluation and anti-spam limits`() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val manager = com.example.ui.engagement.EngagementManager(context)
+
+        // Initial launch metrics
+        val initialMetrics = manager.getUsageMetrics()
+        assertTrue(initialMetrics.sessionCount >= 1)
+
+        // First 2 radar checks should return NONE (needs at least 3)
+        var prompt = manager.recordRadarCheck(90)
+        assertEquals(com.example.ui.engagement.EngagementDialogType.NONE, prompt)
+        
+        prompt = manager.recordRadarCheck(90)
+        assertEquals(com.example.ui.engagement.EngagementDialogType.NONE, prompt)
+
+        // 3rd check should suggest RATE_APP
+        prompt = manager.recordRadarCheck(90)
+        assertEquals(com.example.ui.engagement.EngagementDialogType.RATE_APP, prompt)
+
+        // Mark shown
+        manager.markPromptShown(prompt)
+
+        // Immediately checking again must return NONE due to session & global 3-day cooldown
+        prompt = manager.recordRadarCheck(90)
+        assertEquals(com.example.ui.engagement.EngagementDialogType.NONE, prompt)
+    }
 }

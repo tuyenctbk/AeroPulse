@@ -12,65 +12,108 @@ enum class EngagementDialogType {
     UPDATE_APP
 }
 
+data class AppUsageMetrics(
+    val sessionCount: Int,
+    val radarCheckCount: Int,
+    val daysSinceFirstLaunch: Int,
+    val hasRated: Boolean,
+    val hasShared: Boolean,
+    val ratingPermanentlyDismissed: Boolean
+)
+
 class EngagementManager(private val context: Context) {
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences("aeropulse_engagement_prefs", Context.MODE_PRIVATE)
 
-    companion object {
-        private const val KEY_FIRST_LAUNCH = "first_launch_timestamp"
-        private const val KEY_SESSION_COUNT = "session_count"
-        private const val KEY_RADAR_CHECKS = "radar_check_count"
-        private const val KEY_LAST_PROMPT = "last_prompt_timestamp"
-        private const val KEY_HAS_RATED = "has_rated"
-        private const val KEY_HAS_SHARED = "has_shared"
-        private const val KEY_LAST_UPDATE_CHECK = "last_update_check"
+    private var promptShownThisSession: Boolean = false
 
-        private const val MIN_RADAR_CHECKS_FOR_RATING = 3
-        private const val MIN_DAYS_BETWEEN_PROMPTS_MS = 3 * 24 * 60 * 60 * 1000L // 3 days
+    companion object {
+        const val KEY_FIRST_LAUNCH = "first_launch_timestamp"
+        const val KEY_SESSION_COUNT = "session_count"
+        const val KEY_RADAR_CHECKS = "radar_check_count"
+        const val KEY_LAST_PROMPT = "last_prompt_timestamp"
+        const val KEY_HAS_RATED = "has_rated"
+        const val KEY_RATING_DISMISSED_PERMANENTLY = "rating_dismissed_permanently"
+        const val KEY_HAS_SHARED = "has_shared"
+        const val KEY_LAST_UPDATE_PROMPT = "last_update_prompt_timestamp"
+
+        const val MIN_GLOBAL_PROMPT_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000L // 3 days minimum between any prompt
+        const val MIN_UPDATE_PROMPT_INTERVAL_MS = 10 * 24 * 60 * 60 * 1000L // 10 days between update prompts
     }
 
     init {
         if (!prefs.contains(KEY_FIRST_LAUNCH)) {
             prefs.edit().putLong(KEY_FIRST_LAUNCH, System.currentTimeMillis()).apply()
         }
-        val sessions = prefs.getInt(KEY_SESSION_COUNT, 0)
-        prefs.edit().putInt(KEY_SESSION_COUNT, sessions + 1).apply()
+        val sessions = prefs.getInt(KEY_SESSION_COUNT, 0) + 1
+        prefs.edit().putInt(KEY_SESSION_COUNT, sessions).apply()
     }
 
-    fun recordRadarCheck(): EngagementDialogType {
+    fun getUsageMetrics(): AppUsageMetrics {
+        val firstLaunch = prefs.getLong(KEY_FIRST_LAUNCH, System.currentTimeMillis())
+        val days = ((System.currentTimeMillis() - firstLaunch) / (24 * 60 * 60 * 1000L)).toInt().coerceAtLeast(1)
+        return AppUsageMetrics(
+            sessionCount = prefs.getInt(KEY_SESSION_COUNT, 1),
+            radarCheckCount = prefs.getInt(KEY_RADAR_CHECKS, 0),
+            daysSinceFirstLaunch = days,
+            hasRated = prefs.getBoolean(KEY_HAS_RATED, false),
+            hasShared = prefs.getBoolean(KEY_HAS_SHARED, false),
+            ratingPermanentlyDismissed = prefs.getBoolean(KEY_RATING_DISMISSED_PERMANENTLY, false)
+        )
+    }
+
+    fun recordRadarCheck(verdictScore: Int = 85): EngagementDialogType {
         val checks = prefs.getInt(KEY_RADAR_CHECKS, 0) + 1
         prefs.edit().putInt(KEY_RADAR_CHECKS, checks).apply()
-        return evaluateSmartPrompt()
+        return evaluateSmartPrompt(verdictScore)
     }
 
-    fun evaluateSmartPrompt(): EngagementDialogType {
-        val now = System.currentTimeMillis()
-        val lastPrompt = prefs.getLong(KEY_LAST_PROMPT, 0L)
-        val hasRated = prefs.getBoolean(KEY_HAS_RATED, false)
-        val hasShared = prefs.getBoolean(KEY_HAS_SHARED, false)
-        val checks = prefs.getInt(KEY_RADAR_CHECKS, 0)
-
-        // Don't disturb user if prompted recently
-        if (now - lastPrompt < MIN_DAYS_BETWEEN_PROMPTS_MS) {
+    fun evaluateSmartPrompt(verdictScore: Int = 85): EngagementDialogType {
+        if (promptShownThisSession) {
             return EngagementDialogType.NONE
         }
 
-        // Priority 1: Rating prompt after user experienced multiple successful radar scans
-        if (!hasRated && checks >= MIN_RADAR_CHECKS_FOR_RATING) {
+        val now = System.currentTimeMillis()
+        val lastPrompt = prefs.getLong(KEY_LAST_PROMPT, 0L)
+
+        // Strict anti-spam rule: minimum 3 days (72h) between showing ANY auto-popup
+        if (now - lastPrompt < MIN_GLOBAL_PROMPT_INTERVAL_MS) {
+            return EngagementDialogType.NONE
+        }
+
+        val sessions = prefs.getInt(KEY_SESSION_COUNT, 1)
+        val checks = prefs.getInt(KEY_RADAR_CHECKS, 0)
+        val hasRated = prefs.getBoolean(KEY_HAS_RATED, false)
+        val ratingDismissedPermanently = prefs.getBoolean(KEY_RATING_DISMISSED_PERMANENTLY, false)
+        val hasShared = prefs.getBoolean(KEY_HAS_SHARED, false)
+        val lastUpdatePrompt = prefs.getLong(KEY_LAST_UPDATE_PROMPT, 0L)
+
+        // Priority 1: Rate App (User has completed >= 3 scans and score >= 60)
+        if (!hasRated && !ratingDismissedPermanently && checks >= 3 && verdictScore >= 60) {
             return EngagementDialogType.RATE_APP
         }
 
-        // Priority 2: Share prompt after 6 checks
-        if (!hasShared && checks >= 6) {
+        // Priority 2: Share App (User has completed >= 5 scans and encounters a great window >= 80)
+        if (!hasShared && checks >= 5 && verdictScore >= 80) {
             return EngagementDialogType.SHARE_APP
+        }
+
+        // Priority 3: Update App (User is active with 8+ sessions or 10+ scans, and 10+ days since last update prompt)
+        if (sessions >= 8 && (now - lastUpdatePrompt > MIN_UPDATE_PROMPT_INTERVAL_MS)) {
+            return EngagementDialogType.UPDATE_APP
         }
 
         return EngagementDialogType.NONE
     }
 
-    fun markPromptShown() {
-        prefs.edit().putLong(KEY_LAST_PROMPT, System.currentTimeMillis()).apply()
+    fun markPromptShown(type: EngagementDialogType) {
+        promptShownThisSession = true
+        val now = System.currentTimeMillis()
+        prefs.edit().putLong(KEY_LAST_PROMPT, now).apply()
+        if (type == EngagementDialogType.UPDATE_APP) {
+            prefs.edit().putLong(KEY_LAST_UPDATE_PROMPT, now).apply()
+        }
     }
 
     fun onUserRated() {
@@ -90,14 +133,15 @@ class EngagementManager(private val context: Context) {
     }
 
     fun onUserRemindLater() {
-        // Postpone by setting last prompt to now
+        // Postpone by setting last prompt timestamp
         prefs.edit().putLong(KEY_LAST_PROMPT, System.currentTimeMillis()).apply()
     }
 
     fun onUserDismissedPermanently() {
         prefs.edit()
+            .putBoolean(KEY_RATING_DISMISSED_PERMANENTLY, true)
             .putBoolean(KEY_HAS_RATED, true)
-            .putLong(KEY_LAST_PROMPT, System.currentTimeMillis() + (30L * 24 * 60 * 60 * 1000L))
+            .putLong(KEY_LAST_PROMPT, System.currentTimeMillis())
             .apply()
     }
 

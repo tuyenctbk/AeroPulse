@@ -13,6 +13,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -112,17 +113,20 @@ fun AeroPulseMainScreen(
             )
         }
     ) { innerPadding ->
-        Box(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
                 .background(VoidBlack),
             contentAlignment = Alignment.TopCenter
         ) {
+            val isExpanded = maxWidth >= 720.dp
+            val contentMaxWidth = if (isExpanded) 1200.dp else 680.dp
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .widthIn(max = 680.dp)
+                    .widthIn(max = contentMaxWidth)
             ) {
                 // Top Atmospheric Header Bar
                 TopHeaderBar(
@@ -134,7 +138,8 @@ fun AeroPulseMainScreen(
                     onToggleFavorite = { viewModel.toggleFavoriteCurrent() },
                     onRefresh = { viewModel.refreshTelemetry() },
                     onShareWindow = { viewModel.triggerManualShare() },
-                    onOpenPrivacyPolicy = { viewModel.openPrivacyPolicy() }
+                    onOpenPrivacyPolicy = { viewModel.openPrivacyPolicy() },
+                    onOpenUsageStats = { viewModel.openUsageStats() }
                 )
 
                 // Profile Selector Chips with smooth selection feedback
@@ -218,7 +223,8 @@ fun AeroPulseMainScreen(
                                 is TelemetryUiState.Success -> {
                                     DashboardContent(
                                         telemetry = telemetry.data,
-                                        profile = uiState.activeProfile
+                                        profile = uiState.activeProfile,
+                                        isExpanded = isExpanded
                                     )
                                 }
                             }
@@ -307,6 +313,21 @@ fun AeroPulseMainScreen(
                     onDismiss = { viewModel.closePrivacyPolicy() }
                 )
             }
+
+            if (uiState.isUsageStatsOpen) {
+                com.example.ui.engagement.AppUsageStatsDialog(
+                    metrics = uiState.usageMetrics,
+                    onRateRequested = {
+                        viewModel.closeUsageStats()
+                        viewModel.onRateNow()
+                    },
+                    onShareRequested = {
+                        viewModel.closeUsageStats()
+                        viewModel.triggerManualShare()
+                    },
+                    onDismiss = { viewModel.closeUsageStats() }
+                )
+            }
         }
     }
 }
@@ -321,14 +342,15 @@ private fun TopHeaderBar(
     onToggleFavorite: () -> Unit,
     onRefresh: () -> Unit,
     onShareWindow: () -> Unit,
-    onOpenPrivacyPolicy: () -> Unit
+    onOpenPrivacyPolicy: () -> Unit,
+    onOpenUsageStats: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
     ) {
-        // Row 1: App branding & quick actions (Refresh, Share, Privacy)
+        // Row 1: App branding & quick actions (Refresh, Share, Usage Stats, Privacy)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -372,7 +394,7 @@ private fun TopHeaderBar(
 
             Spacer(modifier = Modifier.width(6.dp))
 
-            // Action Buttons Row (Refresh, Share, Privacy)
+            // Action Buttons Row (Refresh, Share, Usage Stats, Privacy)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Refresh Button
                 IconButton(
@@ -407,6 +429,21 @@ private fun TopHeaderBar(
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = stringResource(R.string.cd_share_window),
+                        tint = AeroCyan,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+
+                // Usage Stats Button
+                IconButton(
+                    onClick = onOpenUsageStats,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .testTag("usage_stats_button")
+                ) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Dashboard,
+                        contentDescription = stringResource(R.string.cd_usage_stats),
                         tint = AeroCyan,
                         modifier = Modifier.size(18.dp)
                     )
@@ -537,11 +574,17 @@ private fun ProfileChipsRow(
 @Composable
 private fun DashboardContent(
     telemetry: com.example.domain.AeroPulseTelemetry,
-    profile: UserProfile
+    profile: UserProfile,
+    isExpanded: Boolean = false
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
+        contentPadding = PaddingValues(
+            start = if (isExpanded) 24.dp else 16.dp,
+            end = if (isExpanded) 24.dp else 16.dp,
+            top = 8.dp,
+            bottom = 24.dp
+        ),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         // Cached Fallback Banner if remote request failed
@@ -572,47 +615,92 @@ private fun DashboardContent(
             }
         }
 
-        // 1. Verdict Dial Card
-        item {
-            VerdictDialCard(
-                verdict = telemetry.verdict,
-                profile = profile
-            )
-        }
+        if (isExpanded) {
+            // Adaptive 2-Column Meteorological Cockpit for Tablets, Foldables & Leanback Screens
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.Top
+                ) {
+                    // Left Column: Primary Flight Decisions & 24h Timeline
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        VerdictDialCard(
+                            verdict = telemetry.verdict,
+                            profile = profile
+                        )
+                        HourlyRadarTimeline(
+                            hourlyPoints = telemetry.hourlyRadar
+                        )
+                    }
 
-        // 2. 24-Hour Timeline
-        item {
-            HourlyRadarTimeline(
-                hourlyPoints = telemetry.hourlyRadar
-            )
-        }
+                    // Right Column: Environmental Telemetry Sensors
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        PollenRadarCard(
+                            pollen = telemetry.pollen
+                        )
+                        AirPurityMatrixCard(
+                            purity = telemetry.purity
+                        )
+                        SolarCelestialCard(
+                            solar = telemetry.solar
+                        )
+                        SpaceWeatherCard(
+                            spaceWeather = telemetry.spaceWeather
+                        )
+                    }
+                }
+            }
+        } else {
+            // Mobile Compact Single-Column Layout
+            // 1. Verdict Dial Card
+            item {
+                VerdictDialCard(
+                    verdict = telemetry.verdict,
+                    profile = profile
+                )
+            }
 
-        // 3. Pollen Radar Card
-        item {
-            PollenRadarCard(
-                pollen = telemetry.pollen
-            )
-        }
+            // 2. 24-Hour Timeline
+            item {
+                HourlyRadarTimeline(
+                    hourlyPoints = telemetry.hourlyRadar
+                )
+            }
 
-        // 4. Air Purity Matrix Card
-        item {
-            AirPurityMatrixCard(
-                purity = telemetry.purity
-            )
-        }
+            // 3. Pollen Radar Card
+            item {
+                PollenRadarCard(
+                    pollen = telemetry.pollen
+                )
+            }
 
-        // 5. Solar & Celestial Rhythm Card
-        item {
-            SolarCelestialCard(
-                solar = telemetry.solar
-            )
-        }
+            // 4. Air Purity Matrix Card
+            item {
+                AirPurityMatrixCard(
+                    purity = telemetry.purity
+                )
+            }
 
-        // 6. NOAA Space Weather Card
-        item {
-            SpaceWeatherCard(
-                spaceWeather = telemetry.spaceWeather
-            )
+            // 5. Solar & Celestial Rhythm Card
+            item {
+                SolarCelestialCard(
+                    solar = telemetry.solar
+                )
+            }
+
+            // 6. NOAA Space Weather Card
+            item {
+                SpaceWeatherCard(
+                    spaceWeather = telemetry.spaceWeather
+                )
+            }
         }
     }
 }

@@ -141,3 +141,31 @@ AeroPulse is an atmospheric and environmental intelligence radar for runners, al
 - Location search -> Triggers Open-Meteo Geocoding API -> Selects location -> Saves to Room -> Fetches fresh telemetry.
 - Wear OS mode toggle -> Switches between Mobile Dashboard, Wear OS Watch Face Preview, and Wear OS Tile Simulator.
 - Refresh action -> Pulls live remote data with loading spinner and offline fallback banner on failure.
+
+---
+
+### 5. UI/UX Polish, Animation, Icons, TV Banner & Adaptive Design (Completed)
+
+1. **Custom Adaptive Icon & Multi-Density Mipmaps**:
+   - `ic_launcher_foreground.xml` and `ic_launcher_background.xml` vector drawables conforming to Android adaptive icon safe zones (66dp within 108dp).
+   - High-contrast, sharp PNG mipmap icons generated for both square (`ic_launcher.png`) and circular (`ic_launcher_round.png`) masks across all 5 densities: `mdpi` (48px), `hdpi` (72px), `xhdpi` (96px), `xxhdpi` (144px), and `xxxhdpi` (192px).
+   - Legacy webp placeholder files cleaned up to prevent build conflicts.
+
+2. **Android TV & Leanback Launcher Banner**:
+   - 320x180 8-bit sRGB PNG (`app/src/main/res/drawable/banner.png`) compliant with Android Leanback launcher specifications.
+   - Declared in `AndroidManifest.xml` via `android:banner="@drawable/banner"` with `category.LEANBACK_LAUNCHER`.
+
+3. **Cinematic Splash Screen**:
+   - Continuous 360-degree radar sweep beam with expanding range rings, radar ripple waves, crosshairs, and dynamic status calibration.
+   - Fast-return UX with instant skip on tap.
+
+4. **Responsive Adaptive Cockpit Layouts**:
+   - Dynamic `BoxWithConstraints` container responding to device screen widths:
+     - **Expanded screens (>= 720dp — Tablets, Foldables, TV, Landscape)**: Dual-pane meteorological station layout. Left pane features the primary Outdoor Verdict Dial and 24-hour safe running timeline; right pane displays the environmental telemetry suite (Pollen Radar, Air Purity Matrix, Solar/Celestial, NOAA Space Weather).
+     - **Compact screens (< 720dp — Handheld Smartphones)**: Fluid single-column stream.
+   - Touch targets exceed the 48dp accessibility standard.
+
+5. **Tactile Micro-Animations**:
+   - **Verdict Dial Card**: Live counting number ticker (`animateIntAsState`) and precision aeronautical tick marks.
+   - **Hourly Radar Timeline**: Spring-loaded pillar selection animation (`Spring.DampingRatioMediumBouncy`) with scale transformation.
+   - **Full Localization**: Zero hardcoded strings across all 20 supported languages.
