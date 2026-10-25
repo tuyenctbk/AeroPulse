@@ -1,18 +1,78 @@
-*.iml
-.gradle
-.kotlin
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
+# Built application & package files
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Gradle & Build caches
+.gradle/
+build/
 /build
-/captures
-.externalNativeBuild
-.cxx
+*/build
+app/build/
+bin/
+gen/
+out/
+
+# Local configuration & credentials
 local.properties
-.env
+/local.properties
+*.jks
+*.keystore
 debug.keystore
+common_release_key.jks
+*.key
+*.p12
+*.pem
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Android Studio / IntelliJ IDEA
+*.iml
+.idea/
+/.idea/
+*.ipr
+*.iws
+
+# Kotlin compiler daemon & session files
+.kotlin/
+*.salive
+
+# Visual Studio Code
+.vscode/
+
+# NDK & C++ build artifacts
+.externalNativeBuild/
+.cxx/
+
+# Profiling & Diagnostics
+captures/
+.navigation/
+*.log
+*.hprof
+*.dump
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+
+# Editor temporary & backup files
+*~
+*.swp
+*.swo
+*.bak
+*.tmp
+
+# Python bytecode & cache
+__pycache__/
+*.pyc
+*.pyo

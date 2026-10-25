@@ -90,6 +90,7 @@ fun WearOsWatchSimulator(
     Surface(
         modifier = modifier
             .fillMaxWidth()
+            .dpadFocusable(RoundedCornerShape(24.dp))
             .testTag("wear_os_simulator_card"),
         shape = RoundedCornerShape(24.dp),
         color = SurfaceDark,
@@ -101,7 +102,7 @@ fun WearOsWatchSimulator(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Simulator Mode Header Switcher
+            // Simulator Mode Header Switcher with responsive layout
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -117,34 +118,35 @@ fun WearOsWatchSimulator(
                         tint = AeroCyan,
                         modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = stringResource(R.string.wear_os_companion_title),
-                        style = MaterialTheme.typography.titleSmall.copy(
+                        style = MaterialTheme.typography.labelMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp,
+                            fontSize = 11.5.sp,
                             color = TextWhite
                         ),
-                        maxLines = 1,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        maxLines = 1
                     )
                 }
 
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-                // Sub-mode pill
+                // Sub-mode pill with D-Pad focusability
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(14.dp))
                         .background(Color(0xFF0C1322))
+                        .border(1.dp, CardBorder, RoundedCornerShape(14.dp))
                         .padding(2.dp)
                 ) {
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
                             .background(if (simMode == WearOsSimView.WATCH_FACE) AeroCyan else Color.Transparent)
+                            .dpadFocusable(RoundedCornerShape(12.dp))
                             .clickable { simMode = WearOsSimView.WATCH_FACE }
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                            .padding(horizontal = 9.dp, vertical = 4.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.watch_face_tab),
@@ -159,8 +161,9 @@ fun WearOsWatchSimulator(
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
                             .background(if (simMode == WearOsSimView.GLANCE_TILE) AeroCyan else Color.Transparent)
+                            .dpadFocusable(RoundedCornerShape(12.dp))
                             .clickable { simMode = WearOsSimView.GLANCE_TILE }
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                            .padding(horizontal = 9.dp, vertical = 4.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.wrist_tile_tab),
@@ -307,7 +310,7 @@ private fun WatchFaceContent(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "${telemetry.purity.pm25.roundToInt()} µg",
+                    text = stringResource(R.string.pm25_ug_format, telemetry.purity.pm25.roundToInt()),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontSize = 9.sp,
                         fontFamily = FontFamily.Monospace,

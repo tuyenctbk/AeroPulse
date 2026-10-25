@@ -222,4 +222,13 @@
     <string name="usage_status_pending">Pending</string>
     <string name="usage_stats_subtitle">Optimized engagement telemetry active</string>
     <string name="cd_usage_stats">App Usage Stats</string>
+    <string name="usage_metric_sessions">Sessions</string>
+    <string name="usage_metric_scans">Atmospheric Scans</string>
+    <string name="usage_metric_days_active">Days Active</string>
+    <string name="usage_days_format">%1$d Days</string>
+    <string name="usage_metric_review_status">Review Status</string>
+    <string name="no_location_title">No Location Selected</string>
+    <string name="no_location_message">Search for any city worldwide or calibrate atmospheric radar with real-time GPS.</string>
+    <string name="select_location">Select Location</string>
+    <string name="wear_os_no_location">Select a location to preview Wear OS complications and live wrist tile</string>
 </resources>

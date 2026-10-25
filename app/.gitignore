@@ -1,1 +1,7 @@
 /build
+build/
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class

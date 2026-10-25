@@ -30,6 +30,7 @@ enum class AppViewMode {
 }
 
 sealed interface TelemetryUiState {
+    data object Empty : TelemetryUiState
     data object Loading : TelemetryUiState
     data class Success(val data: AeroPulseTelemetry) : TelemetryUiState
     data class Error(val message: String) : TelemetryUiState
@@ -37,16 +38,8 @@ sealed interface TelemetryUiState {
 
 data class AeroPulseUiState(
     val activeProfile: UserProfile = UserProfile.RUNNER,
-    val activeLocation: SavedLocation = SavedLocation(
-        name = "Boulder",
-        region = "Colorado",
-        country = "United States",
-        latitude = 40.0150,
-        longitude = -105.2705,
-        isFavorite = true,
-        isDefault = true
-    ),
-    val telemetryState: TelemetryUiState = TelemetryUiState.Loading,
+    val activeLocation: SavedLocation? = null,
+    val telemetryState: TelemetryUiState = TelemetryUiState.Empty,
     val viewMode: AppViewMode = AppViewMode.DASHBOARD,
     val isRefreshing: Boolean = false,
     val isSearchOpen: Boolean = false,
@@ -83,7 +76,15 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
 
     init {
         _uiState.update { it.copy(usageMetrics = engagementManager.getUsageMetrics()) }
-        loadTelemetryForActiveLocation()
+        viewModelScope.launch {
+            repository.savedLocations.collect { locations ->
+                if (_uiState.value.activeLocation == null && locations.isNotEmpty()) {
+                    val defaultLoc = locations.firstOrNull { it.isDefault } ?: locations.first()
+                    _uiState.update { it.copy(activeLocation = defaultLoc) }
+                    loadTelemetryForActiveLocation()
+                }
+            }
+        }
     }
 
     fun selectProfile(profile: UserProfile) {
@@ -153,7 +154,7 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun toggleFavoriteCurrent() {
-        val current = _uiState.value.activeLocation
+        val current = _uiState.value.activeLocation ?: return
         val updated = current.copy(isFavorite = !current.isFavorite)
         _uiState.update { it.copy(activeLocation = updated) }
         viewModelScope.launch {
@@ -168,11 +169,12 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun setGpsLocation(lat: Double, lon: Double, locality: String? = null) {
-        val name = locality ?: "Current GPS Location"
+        val app = getApplication<Application>()
+        val name = locality ?: app.getString(com.example.R.string.current_gps_location)
         val gpsLoc = SavedLocation(
             name = name,
-            region = "Local Radar",
-            country = "GPS Device",
+            region = app.getString(com.example.R.string.local_radar_label),
+            country = app.getString(com.example.R.string.gps_device_label),
             latitude = lat,
             longitude = lon,
             isFavorite = false
@@ -194,6 +196,10 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
         viewModelScope.launch {
             val state = _uiState.value
             val loc = state.activeLocation
+            if (loc == null) {
+                _uiState.update { it.copy(telemetryState = TelemetryUiState.Empty, isRefreshing = false) }
+                return@launch
+            }
             val profile = state.activeProfile
 
             if (isManualRefresh) {
@@ -225,9 +231,10 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
                     engagementManager.markPromptShown(suggestedDialog)
                 }
             } catch (e: Exception) {
+                val failMsg = getApplication<Application>().getString(com.example.R.string.failed_to_load_telemetry)
                 _uiState.update {
                     it.copy(
-                        telemetryState = TelemetryUiState.Error(e.message ?: "Failed to load telemetry"),
+                        telemetryState = TelemetryUiState.Error(e.message ?: failMsg),
                         isRefreshing = false
                     )
                 }
@@ -271,11 +278,13 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun triggerManualShare() {
+        val loc = _uiState.value.activeLocation?.name ?: return
         val telemetry = (_uiState.value.telemetryState as? TelemetryUiState.Success)?.data
-        val loc = _uiState.value.activeLocation.name
         val score = telemetry?.verdict?.score ?: 85
-        val label = telemetry?.verdict?.level?.shortLabel ?: "GO"
-        val shareText = "AeroPulse Environmental Radar for $loc: Score $score/100 ($label). Check outdoor air purity and UV before your run!"
+        val app = getApplication<Application>()
+        val label = telemetry?.verdict?.level?.let { app.getString(it.shortLabelRes) }
+            ?: app.getString(com.example.R.string.verdict_go_short)
+        val shareText = app.getString(com.example.R.string.share_summary_text, loc, score, label)
         engagementManager.launchShareIntent(shareText)
     }
 

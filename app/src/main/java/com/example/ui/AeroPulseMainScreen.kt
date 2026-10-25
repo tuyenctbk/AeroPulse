@@ -44,8 +44,11 @@ import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -54,6 +57,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -80,6 +84,7 @@ import com.example.ui.components.SolarCelestialCard
 import com.example.ui.components.SpaceWeatherCard
 import com.example.ui.components.VerdictDialCard
 import com.example.ui.components.WearOsWatchSimulator
+import com.example.ui.components.dpadFocusable
 import com.example.ui.engagement.EngagementDialogType
 import com.example.ui.engagement.PrivacyPolicyDialog
 import com.example.ui.engagement.RateAppDialog
@@ -130,10 +135,11 @@ fun AeroPulseMainScreen(
             ) {
                 // Top Atmospheric Header Bar
                 TopHeaderBar(
-                    locationName = uiState.activeLocation.name,
+                    locationName = uiState.activeLocation?.name ?: stringResource(R.string.select_location),
                     isGps = uiState.isGpsActive,
-                    isFavorite = uiState.activeLocation.isFavorite,
+                    isFavorite = uiState.activeLocation?.isFavorite ?: false,
                     isRefreshing = uiState.isRefreshing,
+                    isExpanded = isExpanded,
                     onOpenSearch = { viewModel.openSearch() },
                     onToggleFavorite = { viewModel.toggleFavoriteCurrent() },
                     onRefresh = { viewModel.refreshTelemetry() },
@@ -153,6 +159,9 @@ fun AeroPulseMainScreen(
                 // Animated Mode Transition
                 AnimatedContent(
                     targetState = uiState.viewMode,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
                     transitionSpec = {
                         (fadeIn(animationSpec = tween(250)) + slideInVertically { it / 8 })
                             .togetherWith(fadeOut(animationSpec = tween(200)) + slideOutVertically { -it / 8 })
@@ -162,6 +171,85 @@ fun AeroPulseMainScreen(
                     when (mode) {
                         AppViewMode.DASHBOARD -> {
                             when (val telemetry = uiState.telemetryState) {
+                                is TelemetryUiState.Empty -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(24.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            modifier = Modifier.widthIn(max = 440.dp)
+                                        ) {
+                                            Surface(
+                                                shape = CircleShape,
+                                                color = Color(0xFF0F1E33),
+                                                border = androidx.compose.foundation.BorderStroke(1.dp, AeroCyan.copy(alpha = 0.4f)),
+                                                modifier = Modifier.size(68.dp)
+                                            ) {
+                                                Box(contentAlignment = Alignment.Center) {
+                                                    Icon(
+                                                        imageVector = Icons.Default.MyLocation,
+                                                        contentDescription = null,
+                                                        tint = AeroCyan,
+                                                        modifier = Modifier.size(32.dp)
+                                                    )
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.height(20.dp))
+                                            Text(
+                                                text = stringResource(R.string.no_location_title),
+                                                style = MaterialTheme.typography.titleLarge.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = TextWhite
+                                                ),
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = stringResource(R.string.no_location_message),
+                                                style = MaterialTheme.typography.bodyMedium.copy(
+                                                    color = TextMuted,
+                                                    lineHeight = 22.sp
+                                                ),
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                            )
+                                            Spacer(modifier = Modifier.height(24.dp))
+                                            Button(
+                                                onClick = onRequestGpsLocation,
+                                                colors = ButtonDefaults.buttonColors(
+                                                    containerColor = AeroCyan,
+                                                    contentColor = VoidBlack
+                                                ),
+                                                shape = RoundedCornerShape(14.dp),
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Icon(imageVector = Icons.Default.MyLocation, contentDescription = null, modifier = Modifier.size(18.dp))
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = stringResource(R.string.use_gps_title),
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.height(10.dp))
+                                            OutlinedButton(
+                                                onClick = { viewModel.openSearch() },
+                                                shape = RoundedCornerShape(14.dp),
+                                                border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Icon(imageVector = Icons.Default.Search, contentDescription = null, tint = TextWhite, modifier = Modifier.size(18.dp))
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = stringResource(R.string.radar_locations_title),
+                                                    color = TextWhite,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                                 is TelemetryUiState.Loading -> {
                                     Box(
                                         modifier = Modifier.fillMaxSize(),
@@ -248,6 +336,32 @@ fun AeroPulseMainScreen(
                                         }
                                     }
                                 }
+                                is TelemetryUiState.Empty -> {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(24.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                            Icon(imageVector = Icons.Default.Watch, contentDescription = null, tint = AeroCyan, modifier = Modifier.size(48.dp))
+                                            Spacer(modifier = Modifier.height(16.dp))
+                                            Text(
+                                                text = stringResource(R.string.wear_os_no_location),
+                                                style = MaterialTheme.typography.bodyMedium.copy(color = TextMuted),
+                                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                            )
+                                            Spacer(modifier = Modifier.height(16.dp))
+                                            Button(
+                                                onClick = { viewModel.openSearch() },
+                                                colors = ButtonDefaults.buttonColors(containerColor = AeroCyan, contentColor = VoidBlack),
+                                                shape = RoundedCornerShape(12.dp)
+                                            ) {
+                                                Text(text = stringResource(R.string.radar_locations_title), fontWeight = FontWeight.Bold)
+                                            }
+                                        }
+                                    }
+                                }
                                 else -> {
                                     Box(
                                         modifier = Modifier.fillMaxSize(),
@@ -287,7 +401,7 @@ fun AeroPulseMainScreen(
                     )
                 }
                 EngagementDialogType.SHARE_APP -> {
-                    val loc = uiState.activeLocation.name
+                    val loc = uiState.activeLocation?.name ?: ""
                     val telemetry = (uiState.telemetryState as? TelemetryUiState.Success)?.data
                     val score = telemetry?.verdict?.score ?: 88
                     val label = telemetry?.verdict?.level?.let { stringResource(it.shortLabelRes) }
@@ -338,6 +452,7 @@ private fun TopHeaderBar(
     isGps: Boolean,
     isFavorite: Boolean,
     isRefreshing: Boolean,
+    isExpanded: Boolean,
     onOpenSearch: () -> Unit,
     onToggleFavorite: () -> Unit,
     onRefresh: () -> Unit,
@@ -345,20 +460,17 @@ private fun TopHeaderBar(
     onOpenPrivacyPolicy: () -> Unit,
     onOpenUsageStats: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-    ) {
-        // Row 1: App branding & quick actions (Refresh, Share, Usage Stats, Privacy)
+    if (isExpanded) {
+        // Streamlined single-row meteorological command bar for Android TV and wide screens
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             // App branding & pulsing radar indicator
             Row(
-                modifier = Modifier.weight(1f, fill = false),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
@@ -392,15 +504,77 @@ private fun TopHeaderBar(
                 }
             }
 
-            Spacer(modifier = Modifier.width(6.dp))
+            // Location Selector Pill & Favorite Toggle in center
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.widthIn(max = 380.dp)
+            ) {
+                Surface(
+                    onClick = onOpenSearch,
+                    shape = RoundedCornerShape(16.dp),
+                    color = SurfaceElevated,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
+                    modifier = Modifier
+                        .weight(1f)
+                        .dpadFocusable(RoundedCornerShape(16.dp))
+                        .testTag("location_selector_pill")
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = if (isGps) Icons.Default.MyLocation else Icons.Default.Place,
+                            contentDescription = stringResource(R.string.cd_location),
+                            tint = AeroCyan,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = locationName,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextWhite
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = stringResource(R.string.cd_select),
+                            tint = TextMuted,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                IconButton(
+                    onClick = onToggleFavorite,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .dpadFocusable(CircleShape)
+                        .testTag("favorite_toggle_button")
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = stringResource(R.string.cd_favorite),
+                        tint = if (isFavorite) Color(0xFFEF4444) else TextMuted,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
 
             // Action Buttons Row (Refresh, Share, Usage Stats, Privacy)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Refresh Button
                 IconButton(
                     onClick = onRefresh,
                     modifier = Modifier
                         .size(36.dp)
+                        .dpadFocusable(CircleShape)
                         .testTag("refresh_radar_button")
                 ) {
                     if (isRefreshing) {
@@ -419,11 +593,11 @@ private fun TopHeaderBar(
                     }
                 }
 
-                // Share Button
                 IconButton(
                     onClick = onShareWindow,
                     modifier = Modifier
                         .size(36.dp)
+                        .dpadFocusable(CircleShape)
                         .testTag("share_window_button")
                 ) {
                     Icon(
@@ -434,11 +608,11 @@ private fun TopHeaderBar(
                     )
                 }
 
-                // Usage Stats Button
                 IconButton(
                     onClick = onOpenUsageStats,
                     modifier = Modifier
                         .size(36.dp)
+                        .dpadFocusable(CircleShape)
                         .testTag("usage_stats_button")
                 ) {
                     Icon(
@@ -449,11 +623,11 @@ private fun TopHeaderBar(
                     )
                 }
 
-                // Privacy Policy Button
                 IconButton(
                     onClick = onOpenPrivacyPolicy,
                     modifier = Modifier
                         .size(36.dp)
+                        .dpadFocusable(CircleShape)
                         .testTag("privacy_policy_button")
                 ) {
                     Icon(
@@ -465,69 +639,193 @@ private fun TopHeaderBar(
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        // Row 2: Active Location Selector Pill & Favorite Toggle Button
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+    } else {
+        // Mobile 2-row layout
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 6.dp)
         ) {
-            Surface(
-                onClick = onOpenSearch,
-                shape = RoundedCornerShape(16.dp),
-                color = SurfaceElevated,
-                border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
-                modifier = Modifier
-                    .weight(1f)
-                    .testTag("location_selector_pill")
+            // Row 1: App branding & quick actions (Refresh, Share, Usage Stats, Privacy)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                // App branding & pulsing radar indicator
                 Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                    modifier = Modifier.weight(1f, fill = false),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = if (isGps) Icons.Default.MyLocation else Icons.Default.Place,
-                        contentDescription = stringResource(R.string.cd_location),
-                        tint = AeroCyan,
-                        modifier = Modifier.size(15.dp)
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(CircleShape)
+                            .background(AeroCyan)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = locationName,
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = TextWhite
-                        ),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = stringResource(R.string.cd_select),
-                        tint = TextMuted,
-                        modifier = Modifier.size(14.dp)
-                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.app_name).uppercase(),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 2.sp,
+                                color = TextWhite
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = stringResource(R.string.app_subtitle),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontSize = 8.sp,
+                                letterSpacing = 1.2.sp,
+                                color = TextMuted
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                // Action Buttons Row (Refresh, Share, Usage Stats, Privacy)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(
+                        onClick = onRefresh,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .dpadFocusable(CircleShape)
+                            .testTag("refresh_radar_button")
+                    ) {
+                        if (isRefreshing) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                                color = AeroCyan
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = stringResource(R.string.cd_refresh),
+                                tint = TextWhite,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = onShareWindow,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .dpadFocusable(CircleShape)
+                            .testTag("share_window_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = stringResource(R.string.cd_share_window),
+                            tint = AeroCyan,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onOpenUsageStats,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .dpadFocusable(CircleShape)
+                            .testTag("usage_stats_button")
+                    ) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Dashboard,
+                            contentDescription = stringResource(R.string.cd_usage_stats),
+                            tint = AeroCyan,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onOpenPrivacyPolicy,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .dpadFocusable(CircleShape)
+                            .testTag("privacy_policy_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Policy,
+                            contentDescription = stringResource(R.string.cd_privacy_policy),
+                            tint = TextMuted,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            // Favorite Button
-            IconButton(
-                onClick = onToggleFavorite,
-                modifier = Modifier
-                    .size(36.dp)
-                    .testTag("favorite_toggle_button")
+            // Row 2: Active Location Selector Pill & Favorite Toggle Button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = stringResource(R.string.cd_favorite),
-                    tint = if (isFavorite) Color(0xFFEF4444) else TextMuted,
-                    modifier = Modifier.size(20.dp)
-                )
+                Surface(
+                    onClick = onOpenSearch,
+                    shape = RoundedCornerShape(16.dp),
+                    color = SurfaceElevated,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
+                    modifier = Modifier
+                        .weight(1f)
+                        .dpadFocusable(RoundedCornerShape(16.dp))
+                        .testTag("location_selector_pill")
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = if (isGps) Icons.Default.MyLocation else Icons.Default.Place,
+                            contentDescription = stringResource(R.string.cd_location),
+                            tint = AeroCyan,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = locationName,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = TextWhite
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = stringResource(R.string.cd_select),
+                            tint = TextMuted,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                IconButton(
+                    onClick = onToggleFavorite,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .dpadFocusable(CircleShape)
+                        .testTag("favorite_toggle_button")
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = stringResource(R.string.cd_favorite),
+                        tint = if (isFavorite) Color(0xFFEF4444) else TextMuted,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     }
@@ -553,7 +851,7 @@ private fun ProfileChipsRow(
                 modifier = Modifier
                     .clip(RoundedCornerShape(14.dp))
                     .background(bg)
-                    .border(1.dp, border, RoundedCornerShape(14.dp))
+                    .dpadFocusable(RoundedCornerShape(14.dp))
                     .clickable { onSelectProfile(profile) }
                     .padding(horizontal = 14.dp, vertical = 7.dp)
                     .testTag("profile_chip_${profile.name.lowercase()}"),
@@ -630,10 +928,12 @@ private fun DashboardContent(
                     ) {
                         VerdictDialCard(
                             verdict = telemetry.verdict,
-                            profile = profile
+                            profile = profile,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
                         )
                         HourlyRadarTimeline(
-                            hourlyPoints = telemetry.hourlyRadar
+                            hourlyPoints = telemetry.hourlyRadar,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                         )
                     }
 
@@ -643,16 +943,20 @@ private fun DashboardContent(
                         verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         PollenRadarCard(
-                            pollen = telemetry.pollen
+                            pollen = telemetry.pollen,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                         )
                         AirPurityMatrixCard(
-                            purity = telemetry.purity
+                            purity = telemetry.purity,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                         )
                         SolarCelestialCard(
-                            solar = telemetry.solar
+                            solar = telemetry.solar,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                         )
                         SpaceWeatherCard(
-                            spaceWeather = telemetry.spaceWeather
+                            spaceWeather = telemetry.spaceWeather,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                         )
                     }
                 }
@@ -663,42 +967,48 @@ private fun DashboardContent(
             item {
                 VerdictDialCard(
                     verdict = telemetry.verdict,
-                    profile = profile
+                    profile = profile,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
                 )
             }
 
             // 2. 24-Hour Timeline
             item {
                 HourlyRadarTimeline(
-                    hourlyPoints = telemetry.hourlyRadar
+                    hourlyPoints = telemetry.hourlyRadar,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                 )
             }
 
             // 3. Pollen Radar Card
             item {
                 PollenRadarCard(
-                    pollen = telemetry.pollen
+                    pollen = telemetry.pollen,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                 )
             }
 
             // 4. Air Purity Matrix Card
             item {
                 AirPurityMatrixCard(
-                    purity = telemetry.purity
+                    purity = telemetry.purity,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                 )
             }
 
             // 5. Solar & Celestial Rhythm Card
             item {
                 SolarCelestialCard(
-                    solar = telemetry.solar
+                    solar = telemetry.solar,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                 )
             }
 
             // 6. NOAA Space Weather Card
             item {
                 SpaceWeatherCard(
-                    spaceWeather = telemetry.spaceWeather
+                    spaceWeather = telemetry.spaceWeather,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                 )
             }
         }
@@ -731,7 +1041,9 @@ private fun AeroPulseBottomNav(
                 unselectedIconColor = TextMuted,
                 unselectedTextColor = TextMuted
             ),
-            modifier = Modifier.testTag("nav_dashboard")
+            modifier = Modifier
+                .dpadFocusable(RoundedCornerShape(16.dp))
+                .testTag("nav_dashboard")
         )
 
         NavigationBarItem(
@@ -750,7 +1062,9 @@ private fun AeroPulseBottomNav(
                 unselectedIconColor = TextMuted,
                 unselectedTextColor = TextMuted
             ),
-            modifier = Modifier.testTag("nav_wear_os")
+            modifier = Modifier
+                .dpadFocusable(RoundedCornerShape(16.dp))
+                .testTag("nav_wear_os")
         )
     }
 }

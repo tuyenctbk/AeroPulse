@@ -167,7 +167,8 @@ class EngagementManager(private val context: Context) {
             type = "text/plain"
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        val shareIntent = Intent.createChooser(sendIntent, "Share Outdoor Window via").apply {
+        val chooserTitle = context.getString(com.example.R.string.share_chooser_title)
+        val shareIntent = Intent.createChooser(sendIntent, chooserTitle).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         context.startActivity(shareIntent)

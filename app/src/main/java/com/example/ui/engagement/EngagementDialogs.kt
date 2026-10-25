@@ -454,44 +454,46 @@ fun AppUsageStatsDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Grid of metrics
+                // 2x2 Metric Grid with guaranteed 50% split per cell
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(SurfaceElevated)
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.usage_sessions_count, metrics.sessionCount),
-                            style = MaterialTheme.typography.bodySmall.copy(color = TextWhite, fontWeight = FontWeight.Medium)
+                        UsageMetricCard(
+                            label = stringResource(R.string.usage_metric_sessions),
+                            value = "${metrics.sessionCount}",
+                            valueColor = TextWhite,
+                            modifier = Modifier.weight(1f)
                         )
-                        Text(
-                            text = stringResource(R.string.usage_scans_count, metrics.radarCheckCount),
-                            style = MaterialTheme.typography.bodySmall.copy(color = AeroCyan, fontWeight = FontWeight.Bold)
+                        UsageMetricCard(
+                            label = stringResource(R.string.usage_metric_scans),
+                            value = "${metrics.radarCheckCount}",
+                            valueColor = AeroCyan,
+                            modifier = Modifier.weight(1f)
                         )
                     }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            text = stringResource(R.string.usage_days_active, metrics.daysSinceFirstLaunch),
-                            style = MaterialTheme.typography.bodySmall.copy(color = TextWhite, fontWeight = FontWeight.Medium)
+                        UsageMetricCard(
+                            label = stringResource(R.string.usage_metric_days_active),
+                            value = stringResource(R.string.usage_days_format, metrics.daysSinceFirstLaunch),
+                            valueColor = TextWhite,
+                            modifier = Modifier.weight(1f)
                         )
                         val statusText = if (metrics.hasRated) stringResource(R.string.usage_status_rated) else stringResource(R.string.usage_status_pending)
-                        Text(
-                            text = stringResource(R.string.usage_rating_status, statusText),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = if (metrics.hasRated) Color(0xFF10B981) else Color(0xFFF59E0B),
-                                fontWeight = FontWeight.Bold
-                            )
+                        val statusColor = if (metrics.hasRated) Color(0xFF10B981) else Color(0xFFF59E0B)
+                        UsageMetricCard(
+                            label = stringResource(R.string.usage_metric_review_status),
+                            value = statusText,
+                            valueColor = statusColor,
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
@@ -525,6 +527,49 @@ fun AppUsageStatsDialog(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun UsageMetricCard(
+    label: String,
+    value: String,
+    valueColor: Color = TextWhite,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        color = Color(0xFF131D2D),
+        border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp)
+        ) {
+            Text(
+                text = label.uppercase(),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.8.sp,
+                    color = TextMuted
+                ),
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Black,
+                    color = valueColor
+                ),
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
         }
     }
 }
