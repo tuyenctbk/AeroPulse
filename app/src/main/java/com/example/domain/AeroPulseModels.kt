@@ -170,6 +170,23 @@ data class AirPurityMetrics(
     val dust: Double
 )
 
+data class DailyTrendPoint(
+    val dateIso: String,
+    val dayOfWeek: String,
+    val score: Int,
+    val level: VerdictLevel,
+    val isHistorical: Boolean,
+    val isToday: Boolean,
+    val maxTemp: Double,
+    val minTemp: Double,
+    val peakUv: Double,
+    val avgPm25: Double,
+    val dominantAllergen: String,
+    @StringRes val limitingFactorRes: Int = R.string.factor_clean_air,
+    val limitingFactorArg: Any? = null,
+    val limitingFactor: String = ""
+)
+
 data class AeroPulseTelemetry(
     val locationName: String,
     val regionCountry: String,
@@ -185,6 +202,7 @@ data class AeroPulseTelemetry(
     val solar: SolarTelemetry,
     val spaceWeather: SpaceWeatherTelemetry,
     val hourlyRadar: List<HourlyRadarPoint>,
+    val sevenDayTrend: List<DailyTrendPoint> = emptyList(),
     val lastUpdatedTimestamp: Long = System.currentTimeMillis(),
     val isCachedFallback: Boolean = false
 )

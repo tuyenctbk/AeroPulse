@@ -181,7 +181,6 @@
     <string name="no_location_message">Recherchez une ville dans le monde ou étalonnez le radar avec le GPS en temps réel.</string>
     <string name="select_location">Sélectionner un lieu</string>
     <string name="wear_os_no_location">Sélectionnez un lieu pour prévisualiser les complications et la carte Wear OS</string>
-
     <string name="outdoor_spots_title">SPOTS PLEIN AIR &amp; SEUILS</string>
     <string name="outdoor_spot_subtitle">Limites personnalisées pour la qualité de l\'air, le pollen &amp; les UV solaires</string>
     <string name="add_outdoor_spot">Ajouter un spot plein air</string>
@@ -220,7 +219,6 @@
     <string name="spot_threshold_score_title">SCORE DE CONFORMITÉ DES SEUILS</string>
     <string name="no_outdoor_spots_saved">Aucun spot enregistré pour l\'instant</string>
     <string name="uv_index_unit">UV</string>
-
     <string name="uv_chart_title">PRÉVISION UV SUR 24 HEURES</string>
     <string name="uv_chart_subtitle">Spline D3 &amp; Fenêtres d\'exposition solaire sécurisées</string>
     <string name="safe_sun_window_title">FENÊTRE D\'EXPOSITION SOLAIRE SÉCURISÉE</string>
@@ -234,7 +232,6 @@
     <string name="advice_uv_very_high">Risque très élevé. Coup de soleil rapide ; limiter l\'exposition.</string>
     <string name="advice_uv_extreme">Risque extrême. Éviter toute exposition directe en milieu de journée.</string>
     <string name="uv_scrubber_hint">Glissez ou touchez le graphique pour inspecter l\'indice solaire heure par heure</string>
-
     <string name="pollen_heatmap_title">CARTE THERMIQUE DU POLLEN BOTANIQUE</string>
     <string name="pollen_heatmap_subtitle">Panaches de dispersion &amp; zones allergènes autour de %1$s</string>
     <string name="layer_all_pollen">Toutes les espèces</string>
@@ -244,4 +241,43 @@
     <string name="allergy_hotspot_advice_format">Panache actif près de %1$s (~%2$d gr/m³). Les personnes sensibles doivent privilégier les parcours face au vent.</string>
     <string name="allergy_planning_default_advice">Éloignez les entraînements extérieurs des parcs boisés lors de l\'émission matinale des pollens.</string>
     <string name="heatmap_tap_hint">Touchez la carte pour inspecter l\'intensité du panache de pollen</string>
+    <string name="seven_day_trend_title">7-DAY GO/NO-GO TREND</string>
+    <string name="seven_day_trend_subtitle">D3 Continuous Curve • 3-Day History + 4-Day Forecast</string>
+    <string name="trend_historical_label">HISTORICAL</string>
+    <string name="trend_forecast_label">FORECAST</string>
+    <string name="trend_today_badge">TODAY</string>
+    <string name="trend_avg_score_format">7-Day Mean: %1$d PTS</string>
+    <string name="trend_best_day_format">Best Window: %1$s (%2$d PTS • %3$s)</string>
+    <string name="trend_outlook_improving">Improving Outdoor Outlook</string>
+    <string name="trend_outlook_stable">Stable Outdoor Conditions</string>
+    <string name="trend_outlook_declining">Adverse Shift Approaching</string>
+    <string name="trend_selected_day_title">DAILY METEOROLOGICAL BREAKDOWN</string>
+    <string name="trend_temp_range_format">%1$.0f° / %2$.0f°C</string>
+    <string name="trend_peak_uv_format">Peak UV %1$.1f</string>
+    <string name="trend_avg_pm25_format">Avg PM2.5: %1$.1f µg/m³</string>
+    <string name="trend_scrubber_hint">Tap or drag across days to inspect Go/No-Go conditions</string>
+    <string name="cd_seven_day_trend">7-Day Go/No-Go Trend Chart</string>
+    <string name="notification_channel_name">Alertes de Fenêtres Extérieures</string>
+    <string name="notification_channel_desc">Alertes prioritaires lorsque les fenêtres d\'activité s\'ouvrent</string>
+    <string name="notification_settings_title">ALERTES PUSH FENÊTRES EXTÉRIEURES</string>
+    <string name="notification_enable_toggle">Activer les Notifications de Fenêtre</string>
+    <string name="notification_threshold_label">Seuil Minimum de Score: %1$d/100 (Statut GO)</string>
+    <string name="notification_favs_only_toggle">Alerter Uniquement pour les Lieux Favoris</string>
+    <string name="notification_test_button">TESTER NOTIFICATION PUSH</string>
+    <string name="notification_test_sent_toast">Notification de test envoyée !</string>
+    <string name="notification_permission_required">Autorisation de notification requise sur Android 13+ pour recevoir les alertes.</string>
+    <string name="notification_permission_grant_btn">ACCORDER AUTORISATION NOTIFICATION</string>
+    <string name="notification_window_title">🌿 Fenêtre Extérieure Ouverte: %1$s</string>
+    <string name="notification_window_body">Le score a atteint %1$d/100 (%2$s). %3$s</string>
+    <string name="notification_test_title">🔔 Alertes AeroPulse Configurées</string>
+    <string name="notification_test_body">Notifications push actives ! Vous recevrez des alertes quand les conditions s\'ouvrent.</string>
+    <string name="cd_notifications">Paramètres de Notification</string>
+    <string name="metric_temp_high_low">Temp Max / Min</string>
+    <string name="metric_solar_uv_index">Indice UV Solaire</string>
+    <string name="metric_particle_load">Charge de Particules</string>
+    <string name="notification_desc_active">Le système vérifiera les scores en arrière-plan</string>
+    <string name="notification_desc_paused">Notifications en pause</string>
+    <string name="notification_threshold_desc">Les alertes se déclenchent lorsque le score atteint ou dépasse ce niveau</string>
+    <string name="notification_favs_only_desc">Seuls les lieux favoris déclenchent les alertes</string>
+    <string name="notification_all_spots_desc">Tous les lieux enregistrés déclenchent les alertes</string>
 </resources>

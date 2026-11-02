@@ -64,7 +64,9 @@ data class DailyWeather(
     val time: List<String> = emptyList(),
     val sunrise: List<String> = emptyList(),
     val sunset: List<String> = emptyList(),
-    @Json(name = "uv_index_max") val uvIndexMax: List<Double?> = emptyList()
+    @Json(name = "uv_index_max") val uvIndexMax: List<Double?> = emptyList(),
+    @Json(name = "temperature_2m_max") val temperature2mMax: List<Double?> = emptyList(),
+    @Json(name = "temperature_2m_min") val temperature2mMin: List<Double?> = emptyList()
 )
 
 @JsonClass(generateAdapter = true)

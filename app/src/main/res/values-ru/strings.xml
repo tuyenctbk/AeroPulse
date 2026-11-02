@@ -181,7 +181,6 @@
     <string name="no_location_message">Найдите любой город мира или откалибруйте атмосферный радар с помощью GPS в реальном времени.</string>
     <string name="select_location">Выбрать локацию</string>
     <string name="wear_os_no_location">Выберите локацию для предварительного просмотра виджетов и плитки Wear OS</string>
-
     <string name="outdoor_spots_title">МЕСТА НА ВОЗДУХЕ И ПОРОГИ</string>
     <string name="outdoor_spot_subtitle">Пользовательские пределы качества воздуха, пыльцы и УФ-излучения</string>
     <string name="add_outdoor_spot">Добавить место</string>
@@ -220,7 +219,6 @@
     <string name="spot_threshold_score_title">БАЛЛ СООТВЕТСТВИЯ ПОРОГАМ</string>
     <string name="no_outdoor_spots_saved">Места еще не сохранены</string>
     <string name="uv_index_unit">UV</string>
-
     <string name="uv_chart_title">24-ЧАСОВОЙ ПРОГНОЗ УФ-ИНДЕКСА</string>
     <string name="uv_chart_subtitle">Сплайн D3 и безопасные окна нахождения на солнце</string>
     <string name="safe_sun_window_title">БЕЗОПАСНОЕ ОКНО СОЛНЕЧНОГО ОБЛУЧЕНИЯ</string>
@@ -234,7 +232,6 @@
     <string name="advice_uv_very_high">Очень высокий риск. Быстрый ожог; ограничьте пребывание на солнце.</string>
     <string name="advice_uv_extreme">Экстремальный риск. Избегайте прямого солнца в полдень.</string>
     <string name="uv_scrubber_hint">Нажмите или проведите по графику для поминутной проверки безопасности солнца</string>
-
     <string name="pollen_heatmap_title">ТЕПЛОВАЯ КАРТА ПЫЛЬЦЫ РАСТЕНИЙ</string>
     <string name="pollen_heatmap_subtitle">Шлейфы рассеивания и зоны аллергии вокруг %1$s</string>
     <string name="layer_all_pollen">Все виды</string>
@@ -244,4 +241,43 @@
     <string name="allergy_hotspot_advice_format">Активный шлейф пыльцы около %1$s (~%2$d gr/m³). Чувствительным людям стоит выбирать маршруты против ветра.</string>
     <string name="allergy_planning_default_advice">Планируйте утренние тренировки подальше от лесопарковых зон во время пыления.</string>
     <string name="heatmap_tap_hint">Нажмите на карту для проверки локальной концентрации пыльцы</string>
+    <string name="seven_day_trend_title">7-DAY GO/NO-GO TREND</string>
+    <string name="seven_day_trend_subtitle">D3 Continuous Curve • 3-Day History + 4-Day Forecast</string>
+    <string name="trend_historical_label">HISTORICAL</string>
+    <string name="trend_forecast_label">FORECAST</string>
+    <string name="trend_today_badge">TODAY</string>
+    <string name="trend_avg_score_format">7-Day Mean: %1$d PTS</string>
+    <string name="trend_best_day_format">Best Window: %1$s (%2$d PTS • %3$s)</string>
+    <string name="trend_outlook_improving">Improving Outdoor Outlook</string>
+    <string name="trend_outlook_stable">Stable Outdoor Conditions</string>
+    <string name="trend_outlook_declining">Adverse Shift Approaching</string>
+    <string name="trend_selected_day_title">DAILY METEOROLOGICAL BREAKDOWN</string>
+    <string name="trend_temp_range_format">%1$.0f° / %2$.0f°C</string>
+    <string name="trend_peak_uv_format">Peak UV %1$.1f</string>
+    <string name="trend_avg_pm25_format">Avg PM2.5: %1$.1f µg/m³</string>
+    <string name="trend_scrubber_hint">Tap or drag across days to inspect Go/No-Go conditions</string>
+    <string name="cd_seven_day_trend">7-Day Go/No-Go Trend Chart</string>
+    <string name="notification_channel_name">Outdoor Window Alerts</string>
+    <string name="notification_channel_desc">High priority alerts when outdoor activity windows open</string>
+    <string name="notification_settings_title">OUTDOOR WINDOW PUSH ALERTS</string>
+    <string name="notification_enable_toggle">Enable Activity Window Notifications</string>
+    <string name="notification_threshold_label">Minimum Score Threshold: %1$d/100 (GO Status)</string>
+    <string name="notification_favs_only_toggle">Alert for Favorite Locations Only</string>
+    <string name="notification_test_button">TEST PUSH NOTIFICATION</string>
+    <string name="notification_test_sent_toast">Test notification sent!</string>
+    <string name="notification_permission_required">Push notification permission required on Android 13+ to receive window alerts.</string>
+    <string name="notification_permission_grant_btn">GRANT NOTIFICATION PERMISSION</string>
+    <string name="notification_window_title">🌿 Outdoor Window Open: %1$s</string>
+    <string name="notification_window_body">Score reached %1$d/100 (%2$s). %3$s</string>
+    <string name="notification_test_title">🔔 AeroPulse Alerts Configured</string>
+    <string name="notification_test_body">Push notifications active! You will receive alerts when Go/No-Go conditions open for your saved locations.</string>
+    <string name="cd_notifications">Notification Settings</string>
+    <string name="metric_temp_high_low">Temp High / Low</string>
+    <string name="metric_solar_uv_index">Solar UV Index</string>
+    <string name="metric_particle_load">Particle Load</string>
+    <string name="notification_desc_active">System will check outdoor scores in background</string>
+    <string name="notification_desc_paused">Notifications paused</string>
+    <string name="notification_threshold_desc">Alerts trigger when Go/No-Go score reaches or exceeds this level</string>
+    <string name="notification_favs_only_desc">Only favorite spots trigger push alerts</string>
+    <string name="notification_all_spots_desc">All saved spots trigger push alerts</string>
 </resources>

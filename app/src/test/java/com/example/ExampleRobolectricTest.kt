@@ -11,6 +11,7 @@ import com.example.domain.GoNoGoEngine
 import com.example.domain.UserProfile
 import com.example.domain.VerdictLevel
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -262,5 +263,98 @@ class ExampleRobolectricTest {
         assertTrue(layers.contains(com.example.ui.components.PollenSpeciesLayer.RAGWEED))
         assertTrue(layers.contains(com.example.ui.components.PollenSpeciesLayer.BIRCH))
         assertTrue(layers.contains(com.example.ui.components.PollenSpeciesLayer.ALDER))
+    }
+
+    @Test
+    fun `test 7-day trend calculation returns exactly 7 days with historical and forecast split`() {
+        val cleanAq = AirQualityResponse(
+            latitude = 40.0,
+            longitude = -105.0,
+            hourly = AirQualityHourly(
+                time = List(24) { "2026-10-14T00:00" },
+                pm25 = List(24) { 8.0 },
+                pm10 = List(24) { 15.0 },
+                uvIndex = List(24) { 2.0 }
+            )
+        )
+        val cleanWeather = WeatherResponse(
+            latitude = 40.0,
+            longitude = -105.0,
+            current = CurrentWeather(temperature2m = 18.0)
+        )
+
+        val telemetry = GoNoGoEngine.computeTelemetry(
+            locationName = "Boulder",
+            regionCountry = "Colorado, US",
+            airQuality = cleanAq,
+            weather = cleanWeather,
+            noaaData = null,
+            profile = UserProfile.RUNNER
+        )
+
+        assertEquals(7, telemetry.sevenDayTrend.size)
+        
+        // Exactly 3 historical days (offsets -3, -2, -1)
+        val historicalDays = telemetry.sevenDayTrend.filter { it.isHistorical }
+        assertEquals(3, historicalDays.size)
+
+        // Exactly 1 today day (offset 0)
+        val todayDays = telemetry.sevenDayTrend.filter { it.isToday }
+        assertEquals(1, todayDays.size)
+
+        // Exactly 3 upcoming forecast days (offsets 1, 2, 3)
+        val forecastDays = telemetry.sevenDayTrend.filter { !it.isHistorical && !it.isToday }
+        assertEquals(3, forecastDays.size)
+
+        // Today's score matches the real-time verdict score
+        assertEquals(telemetry.verdict.score, todayDays.first().score)
+    }
+
+    @Test
+    fun `test 7-day trend with full multi-day daily input maps historical and forecast accurately`() {
+        val days = listOf("2026-10-29", "2026-10-30", "2026-10-31", "2026-11-01", "2026-11-02", "2026-11-03", "2026-11-04")
+        val dailyWeather = DailyWeather(
+            time = days,
+            sunrise = List(7) { "06:15" },
+            sunset = List(7) { "18:45" },
+            uvIndexMax = listOf(3.0, 4.0, 5.0, 6.0, 7.0, 4.5, 3.5),
+            temperature2mMax = listOf(18.0, 19.0, 20.0, 21.0, 22.0, 19.5, 17.0),
+            temperature2mMin = listOf(10.0, 11.0, 12.0, 13.0, 12.5, 11.0, 9.0)
+        )
+        val aq = AirQualityResponse(
+            latitude = 37.77,
+            longitude = -122.41,
+            hourly = AirQualityHourly(
+                time = List(7 * 24) { "2026-10-29T00:00" },
+                pm25 = List(7 * 24) { 10.0 },
+                pm10 = List(7 * 24) { 20.0 },
+                uvIndex = List(7 * 24) { 3.0 }
+            )
+        )
+        val weather = WeatherResponse(
+            latitude = 37.77,
+            longitude = -122.41,
+            current = CurrentWeather(temperature2m = 20.0),
+            daily = dailyWeather
+        )
+
+        val telemetry = GoNoGoEngine.computeTelemetry(
+            locationName = "San Francisco",
+            regionCountry = "California, US",
+            airQuality = aq,
+            weather = weather,
+            noaaData = null,
+            profile = UserProfile.RUNNER
+        )
+
+        assertEquals(7, telemetry.sevenDayTrend.size)
+        assertEquals("2026-10-29", telemetry.sevenDayTrend[0].dateIso)
+        assertTrue(telemetry.sevenDayTrend[0].isHistorical)
+        assertTrue(telemetry.sevenDayTrend[1].isHistorical)
+        assertTrue(telemetry.sevenDayTrend[2].isHistorical)
+        assertTrue(telemetry.sevenDayTrend[3].isToday)
+        assertFalse(telemetry.sevenDayTrend[4].isHistorical)
+        assertFalse(telemetry.sevenDayTrend[5].isHistorical)
+        assertFalse(telemetry.sevenDayTrend[6].isHistorical)
     }
 }

@@ -83,6 +83,7 @@ import com.example.ui.components.LocationSearchBottomSheet
 import com.example.ui.components.PollenRadarCard
 import com.example.ui.components.PollenHeatmapCard
 import com.example.ui.components.SolarCelestialCard
+import com.example.ui.components.SevenDayTrendCard
 import com.example.ui.components.UvForecastChartCard
 import androidx.compose.material.icons.filled.Add
 import com.example.data.model.OutdoorSpot
@@ -1101,6 +1102,11 @@ private fun DashboardContent(
                             hourlyPoints = telemetry.hourlyRadar,
                             modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                         )
+                        SevenDayTrendCard(
+                            trendPoints = telemetry.sevenDayTrend,
+                            profile = profile,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
+                        )
                         UvForecastChartCard(
                             hourlyPoints = telemetry.hourlyRadar,
                             modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
@@ -1166,7 +1172,16 @@ private fun DashboardContent(
                 )
             }
 
-            // 3. 24-Hour UV Forecast & Safe Sun Windows D3 Spline Chart
+            // 3. 7-Day Go/No-Go Trend (D3 Spline Chart)
+            item {
+                SevenDayTrendCard(
+                    trendPoints = telemetry.sevenDayTrend,
+                    profile = profile,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
+                )
+            }
+
+            // 4. 24-Hour UV Forecast & Safe Sun Windows D3 Spline Chart
             item {
                 UvForecastChartCard(
                     hourlyPoints = telemetry.hourlyRadar,
@@ -1174,7 +1189,7 @@ private fun DashboardContent(
                 )
             }
 
-            // 4. Outdoor Spots & User-Defined Thresholds Evaluation
+            // 5. Outdoor Spots & User-Defined Thresholds Evaluation
             item {
                 OutdoorSpotCard(
                     spots = spotUiState.spots,

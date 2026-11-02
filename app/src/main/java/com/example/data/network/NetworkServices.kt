@@ -21,7 +21,8 @@ interface AirQualityApiService {
         @Query("longitude") longitude: Double,
         @Query("hourly") hourly: String = "pm2_5,pm10,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,aerosol_optical_depth,dust,uv_index,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen,european_aqi,us_aqi",
         @Query("timezone") timezone: String = "auto",
-        @Query("forecast_days") forecastDays: Int = 2
+        @Query("past_days") pastDays: Int = 3,
+        @Query("forecast_days") forecastDays: Int = 4
     ): AirQualityResponse
 }
 
@@ -32,9 +33,10 @@ interface WeatherApiService {
         @Query("longitude") longitude: Double,
         @Query("current") current: String = "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,wind_speed_10m",
         @Query("hourly") hourly: String = "temperature_2m,relative_humidity_2m,precipitation_probability",
-        @Query("daily") daily: String = "sunrise,sunset,uv_index_max",
+        @Query("daily") daily: String = "sunrise,sunset,uv_index_max,temperature_2m_max,temperature_2m_min",
         @Query("timezone") timezone: String = "auto",
-        @Query("forecast_days") forecastDays: Int = 2
+        @Query("past_days") pastDays: Int = 3,
+        @Query("forecast_days") forecastDays: Int = 4
     ): WeatherResponse
 }
 

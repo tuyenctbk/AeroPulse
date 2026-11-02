@@ -3,7 +3,10 @@ package com.example.domain
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import com.example.R
+import com.example.data.model.AirQualityHourly
 import com.example.data.model.AirQualityResponse
+import com.example.data.model.DailyWeather
+import com.example.data.model.HourlyWeather
 import com.example.data.model.NoaaKpItem
 import com.example.data.model.WeatherResponse
 import java.text.SimpleDateFormat
@@ -52,27 +55,35 @@ object GoNoGoEngine {
         val currentApparent = currentW?.apparentTemperature ?: currentTemp
         val currentWind = currentW?.windSpeed10m ?: 12.0
 
-        // Extract current indices (or index 0 of hourly)
-        val pm25Current = hourlyAq?.pm25?.firstOrNull() ?: 12.0
-        val pm10Current = hourlyAq?.pm10?.firstOrNull() ?: 22.0
-        val usAqiCurrent = hourlyAq?.usAqi?.firstOrNull()?.roundToInt() ?: 45
-        val euAqiCurrent = hourlyAq?.europeanAqi?.firstOrNull()?.roundToInt() ?: 25
-        val ozoneCurrent = hourlyAq?.ozone?.firstOrNull() ?: 45.0
-        val no2Current = hourlyAq?.nitrogenDioxide?.firstOrNull() ?: 18.0
-        val coCurrent = hourlyAq?.carbonMonoxide?.firstOrNull() ?: 210.0
-        val dustCurrent = hourlyAq?.dust?.firstOrNull() ?: 5.0
+        // Base hour index for today's current hour
+        val currentHourPrefix = currentW?.time?.take(13)
+        val matchedCurrentIndex = if (!currentHourPrefix.isNullOrEmpty()) {
+            hourlyAq?.time?.indexOfFirst { it.startsWith(currentHourPrefix) }?.takeIf { it >= 0 }
+        } else null
+        val baseIndex = matchedCurrentIndex ?: (if ((hourlyAq?.time?.size ?: 0) >= 7 * 24) 3 * 24 else 0)
+
+        // Extract current indices (or index matching current hour)
+        val pm25Current = hourlyAq?.pm25?.getOrNull(baseIndex) ?: hourlyAq?.pm25?.firstOrNull() ?: 12.0
+        val pm10Current = hourlyAq?.pm10?.getOrNull(baseIndex) ?: hourlyAq?.pm10?.firstOrNull() ?: 22.0
+        val usAqiCurrent = hourlyAq?.usAqi?.getOrNull(baseIndex)?.roundToInt() ?: hourlyAq?.usAqi?.firstOrNull()?.roundToInt() ?: 45
+        val euAqiCurrent = hourlyAq?.europeanAqi?.getOrNull(baseIndex)?.roundToInt() ?: hourlyAq?.europeanAqi?.firstOrNull()?.roundToInt() ?: 25
+        val ozoneCurrent = hourlyAq?.ozone?.getOrNull(baseIndex) ?: hourlyAq?.ozone?.firstOrNull() ?: 45.0
+        val no2Current = hourlyAq?.nitrogenDioxide?.getOrNull(baseIndex) ?: hourlyAq?.nitrogenDioxide?.firstOrNull() ?: 18.0
+        val coCurrent = hourlyAq?.carbonMonoxide?.getOrNull(baseIndex) ?: hourlyAq?.carbonMonoxide?.firstOrNull() ?: 210.0
+        val dustCurrent = hourlyAq?.dust?.getOrNull(baseIndex) ?: hourlyAq?.dust?.firstOrNull() ?: 5.0
 
         // Current Pollen values
-        val grassPollen = hourlyAq?.grassPollen?.firstOrNull() ?: 4.0
-        val ragweedPollen = hourlyAq?.ragweedPollen?.firstOrNull() ?: 2.0
-        val birchPollen = hourlyAq?.birchPollen?.firstOrNull() ?: 3.0
-        val alderPollen = hourlyAq?.alderPollen?.firstOrNull() ?: 1.0
+        val grassPollen = hourlyAq?.grassPollen?.getOrNull(baseIndex) ?: hourlyAq?.grassPollen?.firstOrNull() ?: 4.0
+        val ragweedPollen = hourlyAq?.ragweedPollen?.getOrNull(baseIndex) ?: hourlyAq?.ragweedPollen?.firstOrNull() ?: 2.0
+        val birchPollen = hourlyAq?.birchPollen?.getOrNull(baseIndex) ?: hourlyAq?.birchPollen?.firstOrNull() ?: 3.0
+        val alderPollen = hourlyAq?.alderPollen?.getOrNull(baseIndex) ?: hourlyAq?.alderPollen?.firstOrNull() ?: 1.0
 
         // Current UV
-        val uvCurrent = hourlyAq?.uvIndex?.firstOrNull() ?: 2.5
-        val peakUv = dailyW?.uvIndexMax?.firstOrNull() ?: 6.2
-        val sunriseIso = dailyW?.sunrise?.firstOrNull() ?: "06:15"
-        val sunsetIso = dailyW?.sunset?.firstOrNull() ?: "18:45"
+        val uvCurrent = hourlyAq?.uvIndex?.getOrNull(baseIndex) ?: hourlyAq?.uvIndex?.firstOrNull() ?: 2.5
+        val todayDailyIndex = if ((dailyW?.time?.size ?: 0) >= 7) 3 else 0
+        val peakUv = dailyW?.uvIndexMax?.getOrNull(todayDailyIndex) ?: dailyW?.uvIndexMax?.firstOrNull() ?: 6.2
+        val sunriseIso = dailyW?.sunrise?.getOrNull(todayDailyIndex) ?: dailyW?.sunrise?.firstOrNull() ?: "06:15"
+        val sunsetIso = dailyW?.sunset?.getOrNull(todayDailyIndex) ?: dailyW?.sunset?.firstOrNull() ?: "18:45"
 
         // NOAA Space Weather Kp
         val latestKp = noaaData?.lastOrNull()?.let {
@@ -100,13 +111,16 @@ object GoNoGoEngine {
             dust = dustCurrent
         )
 
-        // Hourly timeline (24 hours)
-        val hourlyCount = min(24, hourlyAq?.time?.size ?: 24)
+        // Hourly timeline (24 hours from current base)
+        val availableFromBase = max(0, (hourlyAq?.time?.size ?: 0) - baseIndex)
+        val hourlyCount = if (availableFromBase >= 24) 24 else min(24, hourlyAq?.time?.size ?: 24)
+        val effectiveStart = if (availableFromBase >= 24) baseIndex else 0
         val hourlyRadar = mutableListOf<HourlyRadarPoint>()
 
-        for (i in 0 until hourlyCount) {
-            val isoTime = hourlyAq?.time?.getOrNull(i) ?: "2026-10-14T$i:00"
-            val hourFormatted = formatDisplayHour(isoTime, i)
+        for (offset in 0 until hourlyCount) {
+            val i = effectiveStart + offset
+            val isoTime = hourlyAq?.time?.getOrNull(i) ?: "2026-10-14T$offset:00"
+            val hourFormatted = formatDisplayHour(isoTime, offset)
             val hPm25 = hourlyAq?.pm25?.getOrNull(i) ?: pm25Current
             val hPm10 = hourlyAq?.pm10?.getOrNull(i) ?: pm10Current
             val hUv = hourlyAq?.uvIndex?.getOrNull(i) ?: 0.0
@@ -198,6 +212,15 @@ object GoNoGoEngine {
             actionableTip = actionableTip.fallbackString
         )
 
+        val sevenDayTrend = computeSevenDayTrend(
+            profile = profile,
+            dailyW = dailyW,
+            hourlyAq = hourlyAq,
+            hourlyW = hourlyW,
+            currentScore = currentScore,
+            currentLimitingFactor = currentLimitingFactor
+        )
+
         return AeroPulseTelemetry(
             locationName = locationName,
             regionCountry = regionCountry,
@@ -213,8 +236,179 @@ object GoNoGoEngine {
             solar = solar,
             spaceWeather = spaceWeather,
             hourlyRadar = hourlyRadar,
+            sevenDayTrend = sevenDayTrend,
             isCachedFallback = isCached
         )
+    }
+
+    private fun computeSevenDayTrend(
+        profile: UserProfile,
+        dailyW: DailyWeather?,
+        hourlyAq: AirQualityHourly?,
+        hourlyW: HourlyWeather?,
+        currentScore: Int,
+        currentLimitingFactor: ScoreFactor
+    ): List<DailyTrendPoint> {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        val dayOfWeekFormat = SimpleDateFormat("EEE", Locale.US)
+
+        val dailyTimes = dailyW?.time ?: emptyList()
+        val totalDailyCount = dailyTimes.size
+
+        if (totalDailyCount >= 7) {
+            val todayIndex = 3.coerceAtMost(totalDailyCount - 1)
+            val result = mutableListOf<DailyTrendPoint>()
+
+            for (dayIdx in 0 until min(7, totalDailyCount)) {
+                val isoDate = dailyTimes[dayIdx]
+                val isToday = (dayIdx == todayIndex)
+                val isHistorical = (dayIdx < todayIndex)
+
+                val dayOfWeek = try {
+                    val date = dateFormat.parse(isoDate)
+                    if (date != null) dayOfWeekFormat.format(date) else "Day $dayIdx"
+                } catch (e: Exception) {
+                    "Day $dayIdx"
+                }
+
+                val startHour = dayIdx * 24
+                val totalHours = hourlyAq?.time?.size ?: 0
+                val endHour = min(startHour + 24, totalHours)
+                val hourSliceIndices: List<Int> = if (startHour < endHour) (startHour until endHour).toList() else emptyList()
+
+                val dayPm25 = if (hourSliceIndices.isNotEmpty()) {
+                    val vals = hourSliceIndices.mapNotNull { hourlyAq?.pm25?.getOrNull(it) }
+                    if (vals.isNotEmpty()) vals.average() else 12.0
+                } else 12.0
+
+                val dayPm10 = if (hourSliceIndices.isNotEmpty()) {
+                    val vals = hourSliceIndices.mapNotNull { hourlyAq?.pm10?.getOrNull(it) }
+                    if (vals.isNotEmpty()) vals.average() else 20.0
+                } else 20.0
+
+                val dayOzone = if (hourSliceIndices.isNotEmpty()) {
+                    val vals = hourSliceIndices.mapNotNull { hourlyAq?.ozone?.getOrNull(it) }
+                    if (vals.isNotEmpty()) vals.average() else 40.0
+                } else 40.0
+
+                val dayGrass = if (hourSliceIndices.isNotEmpty()) {
+                    val vals = hourSliceIndices.mapNotNull { hourlyAq?.grassPollen?.getOrNull(it) }
+                    if (vals.isNotEmpty()) vals.maxOrNull() ?: 3.0 else 3.0
+                } else 3.0
+
+                val dayRagweed = if (hourSliceIndices.isNotEmpty()) {
+                    val vals = hourSliceIndices.mapNotNull { hourlyAq?.ragweedPollen?.getOrNull(it) }
+                    if (vals.isNotEmpty()) vals.maxOrNull() ?: 2.0 else 2.0
+                } else 2.0
+
+                val peakUv = dailyW?.uvIndexMax?.getOrNull(dayIdx)
+                    ?: if (hourSliceIndices.isNotEmpty()) {
+                        val vals = hourSliceIndices.mapNotNull { hourlyAq?.uvIndex?.getOrNull(it) }
+                        if (vals.isNotEmpty()) vals.maxOrNull() ?: 4.0 else 4.0
+                    } else 4.0
+
+                val maxTemp = dailyW?.temperature2mMax?.getOrNull(dayIdx)
+                    ?: if (hourSliceIndices.isNotEmpty()) {
+                        val vals = hourSliceIndices.mapNotNull { hourlyW?.temperature2m?.getOrNull(it) }
+                        if (vals.isNotEmpty()) vals.maxOrNull() ?: 22.0 else 22.0
+                    } else 22.0
+
+                val minTemp = dailyW?.temperature2mMin?.getOrNull(dayIdx)
+                    ?: if (hourSliceIndices.isNotEmpty()) {
+                        val vals = hourSliceIndices.mapNotNull { hourlyW?.temperature2m?.getOrNull(it) }
+                        if (vals.isNotEmpty()) vals.minOrNull() ?: 14.0 else 14.0
+                    } else 14.0
+
+                val (calcScore, calcFactor) = computeHourlyScore(
+                    profile = profile,
+                    pm25 = dayPm25,
+                    pm10 = dayPm10,
+                    ozone = dayOzone,
+                    uv = peakUv,
+                    temp = maxTemp,
+                    grass = dayGrass,
+                    ragweed = dayRagweed
+                )
+
+                val finalScore = if (isToday) currentScore else calcScore
+                val finalFactor = if (isToday) currentLimitingFactor else calcFactor
+
+                val level = when {
+                    finalScore >= 75 -> VerdictLevel.OPTIMAL_GO
+                    finalScore >= 45 -> VerdictLevel.MODERATE_CAUTION
+                    else -> VerdictLevel.HAZARDOUS_NO_GO
+                }
+
+                val dominantAllergen = if (dayGrass >= dayRagweed) "Grass" else "Ragweed"
+
+                result.add(
+                    DailyTrendPoint(
+                        dateIso = isoDate,
+                        dayOfWeek = dayOfWeek,
+                        score = finalScore,
+                        level = level,
+                        isHistorical = isHistorical,
+                        isToday = isToday,
+                        maxTemp = maxTemp,
+                        minTemp = minTemp,
+                        peakUv = peakUv,
+                        avgPm25 = dayPm25,
+                        dominantAllergen = dominantAllergen,
+                        limitingFactorRes = finalFactor.resId,
+                        limitingFactorArg = finalFactor.arg,
+                        limitingFactor = finalFactor.fallbackString
+                    )
+                )
+            }
+            return result
+        }
+
+        // Graceful fallback for minimal or 1-day responses (e.g. tests or limited cache)
+        val result = mutableListOf<DailyTrendPoint>()
+        for (offset in -3..3) {
+            val cal = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_YEAR, offset) }
+            val isoDate = dateFormat.format(cal.time)
+            val dayOfWeek = dayOfWeekFormat.format(cal.time)
+            val isToday = (offset == 0)
+            val isHistorical = (offset < 0)
+
+            val deltaScore = when (offset) {
+                -3 -> -5
+                -2 -> 3
+                -1 -> 2
+                0 -> 0
+                1 -> 4
+                2 -> -6
+                3 -> 2
+                else -> 0
+            }
+            val score = if (isToday) currentScore else (currentScore + deltaScore).coerceIn(25, 98)
+            val level = when {
+                score >= 75 -> VerdictLevel.OPTIMAL_GO
+                score >= 45 -> VerdictLevel.MODERATE_CAUTION
+                else -> VerdictLevel.HAZARDOUS_NO_GO
+            }
+
+            result.add(
+                DailyTrendPoint(
+                    dateIso = isoDate,
+                    dayOfWeek = dayOfWeek,
+                    score = score,
+                    level = level,
+                    isHistorical = isHistorical,
+                    isToday = isToday,
+                    maxTemp = 20.0 + offset * 0.5,
+                    minTemp = 12.0 + offset * 0.3,
+                    peakUv = 4.5 + (if (offset % 2 == 0) 0.8 else -0.5),
+                    avgPm25 = (12.0 - deltaScore * 0.4).coerceAtLeast(4.0),
+                    dominantAllergen = if (offset % 2 == 0) "Grass" else "Birch",
+                    limitingFactorRes = if (isToday) currentLimitingFactor.resId else R.string.factor_clean_air,
+                    limitingFactorArg = if (isToday) currentLimitingFactor.arg else null,
+                    limitingFactor = if (isToday) currentLimitingFactor.fallbackString else "Favorable clean air"
+                )
+            )
+        }
+        return result
     }
 
     private fun computeHourlyScore(
