@@ -22,6 +22,9 @@ import com.example.ui.engagement.EngagementManager
 import kotlinx.coroutines.launch
 
 import com.example.ui.engagement.AppUsageMetrics
+import com.example.ui.notifications.AeroPulseNotificationHelper
+import com.example.ui.notifications.NotificationPreferences
+import com.example.ui.notifications.NotificationSettingsManager
 
 enum class AppViewMode {
     DASHBOARD,
@@ -50,16 +53,20 @@ data class AeroPulseUiState(
     val activeDialog: EngagementDialogType = EngagementDialogType.NONE,
     val isPrivacyPolicyOpen: Boolean = false,
     val isUsageStatsOpen: Boolean = false,
+    val isNotificationSettingsOpen: Boolean = false,
+    val notificationPreferences: NotificationPreferences = NotificationPreferences(),
     val usageMetrics: AppUsageMetrics = AppUsageMetrics(1, 0, 1, false, false, false)
 )
 
 class AeroPulseViewModel(application: Application) : AndroidViewModel(application) {
 
     private val engagementManager = EngagementManager(application)
+    private val notificationHelper = AeroPulseNotificationHelper(application)
+    private val notificationSettingsManager = NotificationSettingsManager(application)
 
     private val repository: AeroPulseRepository by lazy {
         val db = AppDatabase.getDatabase(application)
-        AeroPulseRepository(db.locationDao())
+        AeroPulseRepository(db.locationDao(), db.telemetryCacheDao())
     }
 
     val savedLocations: StateFlow<List<SavedLocation>> = repository.savedLocations
@@ -75,7 +82,13 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
     private var searchJob: Job? = null
 
     init {
-        _uiState.update { it.copy(usageMetrics = engagementManager.getUsageMetrics()) }
+        val initialPrefs = notificationSettingsManager.getPreferences()
+        _uiState.update {
+            it.copy(
+                usageMetrics = engagementManager.getUsageMetrics(),
+                notificationPreferences = initialPrefs
+            )
+        }
         viewModelScope.launch {
             repository.savedLocations.collect { locations ->
                 if (_uiState.value.activeLocation == null && locations.isNotEmpty()) {
@@ -230,6 +243,9 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
                 if (suggestedDialog != EngagementDialogType.NONE) {
                     engagementManager.markPromptShown(suggestedDialog)
                 }
+
+                // Check and trigger outdoor activity window push notification if conditions met
+                checkAndNotifyOutdoorWindow(loc, telemetry)
             } catch (e: Exception) {
                 val failMsg = getApplication<Application>().getString(com.example.R.string.failed_to_load_telemetry)
                 _uiState.update {
@@ -240,6 +256,49 @@ class AeroPulseViewModel(application: Application) : AndroidViewModel(applicatio
                 }
             }
         }
+    }
+
+    private fun checkAndNotifyOutdoorWindow(loc: SavedLocation, telemetry: AeroPulseTelemetry) {
+        val prefs = _uiState.value.notificationPreferences
+        if (!prefs.isEnabled) return
+        if (prefs.notifyFavoritesOnly && !loc.isFavorite) return
+
+        val score = telemetry.verdict.score
+        if (score >= prefs.minScoreThreshold) {
+            if (notificationSettingsManager.shouldNotifyForLocation(loc.name)) {
+                val app = getApplication<Application>()
+                val statusLabel = app.getString(telemetry.verdict.level.shortLabelRes)
+                val recommendation = telemetry.verdict.primaryLimitingFactor
+                val sent = notificationHelper.sendOutdoorWindowNotification(
+                    locationName = loc.name,
+                    score = score,
+                    statusLabel = statusLabel,
+                    recommendation = recommendation
+                )
+                if (sent) {
+                    notificationSettingsManager.recordNotificationSent(loc.name)
+                }
+            }
+        }
+    }
+
+    fun openNotificationSettings() {
+        _uiState.update { it.copy(isNotificationSettingsOpen = true) }
+    }
+
+    fun closeNotificationSettings() {
+        _uiState.update { it.copy(isNotificationSettingsOpen = false) }
+    }
+
+    fun updateNotificationPreferences(preferences: NotificationPreferences) {
+        notificationSettingsManager.setEnabled(preferences.isEnabled)
+        notificationSettingsManager.setMinScoreThreshold(preferences.minScoreThreshold)
+        notificationSettingsManager.setNotifyFavoritesOnly(preferences.notifyFavoritesOnly)
+        _uiState.update { it.copy(notificationPreferences = preferences) }
+    }
+
+    fun sendTestNotification() {
+        notificationHelper.sendTestNotification()
     }
 
     fun dismissDialog() {

@@ -41,6 +41,7 @@ import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.Refresh
@@ -80,7 +81,13 @@ import com.example.ui.components.AirPurityMatrixCard
 import com.example.ui.components.HourlyRadarTimeline
 import com.example.ui.components.LocationSearchBottomSheet
 import com.example.ui.components.PollenRadarCard
+import com.example.ui.components.PollenHeatmapCard
 import com.example.ui.components.SolarCelestialCard
+import com.example.ui.components.UvForecastChartCard
+import androidx.compose.material.icons.filled.Add
+import com.example.data.model.OutdoorSpot
+import com.example.data.model.SavedLocation
+import com.example.ui.components.OutdoorSpotCard
 import com.example.ui.components.SpaceWeatherCard
 import com.example.ui.components.VerdictDialCard
 import com.example.ui.components.WearOsWatchSimulator
@@ -103,10 +110,12 @@ import com.example.ui.theme.VoidBlack
 @Composable
 fun AeroPulseMainScreen(
     viewModel: AeroPulseViewModel,
-    onRequestGpsLocation: () -> Unit
+    onRequestGpsLocation: () -> Unit,
+    outdoorSpotViewModel: OutdoorSpotViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by viewModel.savedLocations.collectAsStateWithLifecycle()
+    val spotUiState by outdoorSpotViewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = VoidBlack,
@@ -144,9 +153,20 @@ fun AeroPulseMainScreen(
                     onToggleFavorite = { viewModel.toggleFavoriteCurrent() },
                     onRefresh = { viewModel.refreshTelemetry() },
                     onShareWindow = { viewModel.triggerManualShare() },
+                    onOpenNotificationSettings = { viewModel.openNotificationSettings() },
                     onOpenPrivacyPolicy = { viewModel.openPrivacyPolicy() },
                     onOpenUsageStats = { viewModel.openUsageStats() }
                 )
+
+                // Saved Locations Room Database Quick Switcher
+                SavedLocationsQuickBar(
+                    savedLocations = savedLocations,
+                    activeLocation = uiState.activeLocation,
+                    onSelectLocation = { viewModel.selectSavedLocation(it) },
+                    onOpenSearch = { viewModel.openSearch() }
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // Profile Selector Chips with smooth selection feedback
                 ProfileChipsRow(
@@ -312,6 +332,10 @@ fun AeroPulseMainScreen(
                                     DashboardContent(
                                         telemetry = telemetry.data,
                                         profile = uiState.activeProfile,
+                                        spotUiState = spotUiState,
+                                        onSelectSpot = { outdoorSpotViewModel.selectSpot(it) },
+                                        onSaveSpot = { outdoorSpotViewModel.saveOrUpdateSpot(it) },
+                                        onRefreshSpot = { outdoorSpotViewModel.refreshEvaluation() },
                                         isExpanded = isExpanded
                                     )
                                 }
@@ -442,6 +466,15 @@ fun AeroPulseMainScreen(
                     onDismiss = { viewModel.closeUsageStats() }
                 )
             }
+
+            if (uiState.isNotificationSettingsOpen) {
+                com.example.ui.components.NotificationSettingsDialog(
+                    preferences = uiState.notificationPreferences,
+                    onPreferencesChanged = { viewModel.updateNotificationPreferences(it) },
+                    onSendTestNotification = { viewModel.sendTestNotification() },
+                    onDismiss = { viewModel.closeNotificationSettings() }
+                )
+            }
         }
     }
 }
@@ -457,6 +490,7 @@ private fun TopHeaderBar(
     onToggleFavorite: () -> Unit,
     onRefresh: () -> Unit,
     onShareWindow: () -> Unit,
+    onOpenNotificationSettings: () -> Unit,
     onOpenPrivacyPolicy: () -> Unit,
     onOpenUsageStats: () -> Unit
 ) {
@@ -568,7 +602,7 @@ private fun TopHeaderBar(
                 }
             }
 
-            // Action Buttons Row (Refresh, Share, Usage Stats, Privacy)
+            // Action Buttons Row (Refresh, Notification Alerts, Share, Usage Stats, Privacy)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
                     onClick = onRefresh,
@@ -591,6 +625,21 @@ private fun TopHeaderBar(
                             modifier = Modifier.size(18.dp)
                         )
                     }
+                }
+
+                IconButton(
+                    onClick = onOpenNotificationSettings,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .dpadFocusable(CircleShape)
+                        .testTag("notification_settings_button")
+                ) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Default.Notifications,
+                        contentDescription = stringResource(R.string.cd_notifications),
+                        tint = AeroCyan,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
 
                 IconButton(
@@ -646,7 +695,7 @@ private fun TopHeaderBar(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 6.dp)
         ) {
-            // Row 1: App branding & quick actions (Refresh, Share, Usage Stats, Privacy)
+            // Row 1: App branding & quick actions (Refresh, Notifications, Share, Usage Stats, Privacy)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -690,7 +739,7 @@ private fun TopHeaderBar(
 
                 Spacer(modifier = Modifier.width(6.dp))
 
-                // Action Buttons Row (Refresh, Share, Usage Stats, Privacy)
+                // Action Buttons Row (Refresh, Notifications, Share, Usage Stats, Privacy)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
                         onClick = onRefresh,
@@ -713,6 +762,21 @@ private fun TopHeaderBar(
                                 modifier = Modifier.size(18.dp)
                             )
                         }
+                    }
+
+                    IconButton(
+                        onClick = onOpenNotificationSettings,
+                        modifier = Modifier
+                            .size(36.dp)
+                            .dpadFocusable(CircleShape)
+                            .testTag("notification_settings_button")
+                    ) {
+                        Icon(
+                            imageVector = androidx.compose.material.icons.Icons.Default.Notifications,
+                            contentDescription = stringResource(R.string.cd_notifications),
+                            tint = AeroCyan,
+                            modifier = Modifier.size(18.dp)
+                        )
                     }
 
                     IconButton(
@@ -832,6 +896,104 @@ private fun TopHeaderBar(
 }
 
 @Composable
+private fun SavedLocationsQuickBar(
+    savedLocations: List<SavedLocation>,
+    activeLocation: SavedLocation?,
+    onSelectLocation: (SavedLocation) -> Unit,
+    onOpenSearch: () -> Unit
+) {
+    if (savedLocations.isEmpty()) return
+
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        items(savedLocations) { loc ->
+            val isSelected = loc.id == activeLocation?.id || (loc.name == activeLocation?.name && loc.latitude == activeLocation?.latitude)
+            val bg = if (isSelected) Color(0xFF0F1E33) else SurfaceElevated
+            val textColor = if (isSelected) AeroCyan else TextWhite
+            val border = if (isSelected) AeroCyan else CardBorder
+
+            Surface(
+                onClick = { onSelectLocation(loc) },
+                shape = RoundedCornerShape(12.dp),
+                color = bg,
+                border = androidx.compose.foundation.BorderStroke(1.dp, border),
+                modifier = Modifier
+                    .dpadFocusable(RoundedCornerShape(12.dp))
+                    .testTag("saved_loc_chip_${loc.id}")
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (loc.isFavorite) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = null,
+                            tint = Color(0xFFEF4444),
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Place,
+                            contentDescription = null,
+                            tint = if (isSelected) AeroCyan else TextMuted,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                    }
+                    Text(
+                        text = loc.name,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                            color = textColor,
+                            fontSize = 11.sp
+                        )
+                    )
+                }
+            }
+        }
+
+        item {
+            Surface(
+                onClick = onOpenSearch,
+                shape = RoundedCornerShape(12.dp),
+                color = SurfaceElevated,
+                border = androidx.compose.foundation.BorderStroke(1.dp, CardBorder),
+                modifier = Modifier
+                    .dpadFocusable(RoundedCornerShape(12.dp))
+                    .testTag("btn_add_city_chip")
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.add_outdoor_spot),
+                        tint = AeroCyan,
+                        modifier = Modifier.size(13.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.select_location),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = TextWhite,
+                            fontSize = 10.5.sp
+                        )
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun ProfileChipsRow(
     activeProfile: UserProfile,
     onSelectProfile: (UserProfile) -> Unit
@@ -873,6 +1035,10 @@ private fun ProfileChipsRow(
 private fun DashboardContent(
     telemetry: com.example.domain.AeroPulseTelemetry,
     profile: UserProfile,
+    spotUiState: OutdoorSpotUiState,
+    onSelectSpot: (OutdoorSpot) -> Unit,
+    onSaveSpot: (OutdoorSpot) -> Unit,
+    onRefreshSpot: () -> Unit,
     isExpanded: Boolean = false
 ) {
     LazyColumn(
@@ -921,7 +1087,7 @@ private fun DashboardContent(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.Top
                 ) {
-                    // Left Column: Primary Flight Decisions & 24h Timeline
+                    // Left Column: Primary Decisions, 24h Timeline & Outdoor Spots with User Thresholds
                     Column(
                         modifier = Modifier.weight(1f),
                         verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -935,6 +1101,19 @@ private fun DashboardContent(
                             hourlyPoints = telemetry.hourlyRadar,
                             modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
                         )
+                        UvForecastChartCard(
+                            hourlyPoints = telemetry.hourlyRadar,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
+                        )
+                        OutdoorSpotCard(
+                            spots = spotUiState.spots,
+                            selectedSpot = spotUiState.selectedSpot,
+                            evaluation = spotUiState.evaluation,
+                            isLoading = spotUiState.isLoading,
+                            onSelectSpot = onSelectSpot,
+                            onSaveSpot = onSaveSpot,
+                            onRefresh = onRefreshSpot
+                        )
                     }
 
                     // Right Column: Environmental Telemetry Sensors
@@ -945,6 +1124,13 @@ private fun DashboardContent(
                         PollenRadarCard(
                             pollen = telemetry.pollen,
                             modifier = Modifier.dpadFocusable(RoundedCornerShape(20.dp))
+                        )
+                        PollenHeatmapCard(
+                            pollen = telemetry.pollen,
+                            locationName = telemetry.locationName,
+                            windSpeedKmh = telemetry.windSpeedKmh,
+                            spots = spotUiState.spots,
+                            modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
                         )
                         AirPurityMatrixCard(
                             purity = telemetry.purity,
@@ -980,7 +1166,28 @@ private fun DashboardContent(
                 )
             }
 
-            // 3. Pollen Radar Card
+            // 3. 24-Hour UV Forecast & Safe Sun Windows D3 Spline Chart
+            item {
+                UvForecastChartCard(
+                    hourlyPoints = telemetry.hourlyRadar,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
+                )
+            }
+
+            // 4. Outdoor Spots & User-Defined Thresholds Evaluation
+            item {
+                OutdoorSpotCard(
+                    spots = spotUiState.spots,
+                    selectedSpot = spotUiState.selectedSpot,
+                    evaluation = spotUiState.evaluation,
+                    isLoading = spotUiState.isLoading,
+                    onSelectSpot = onSelectSpot,
+                    onSaveSpot = onSaveSpot,
+                    onRefresh = onRefreshSpot
+                )
+            }
+
+            // 5. Pollen Radar Card
             item {
                 PollenRadarCard(
                     pollen = telemetry.pollen,
@@ -988,7 +1195,18 @@ private fun DashboardContent(
                 )
             }
 
-            // 4. Air Purity Matrix Card
+            // 6. Botanical Pollen Concentration Heatmap
+            item {
+                PollenHeatmapCard(
+                    pollen = telemetry.pollen,
+                    locationName = telemetry.locationName,
+                    windSpeedKmh = telemetry.windSpeedKmh,
+                    spots = spotUiState.spots,
+                    modifier = Modifier.dpadFocusable(RoundedCornerShape(24.dp))
+                )
+            }
+
+            // 7. Air Purity Matrix Card
             item {
                 AirPurityMatrixCard(
                     purity = telemetry.purity,
@@ -996,7 +1214,7 @@ private fun DashboardContent(
                 )
             }
 
-            // 5. Solar & Celestial Rhythm Card
+            // 6. Solar & Celestial Rhythm Card
             item {
                 SolarCelestialCard(
                     solar = telemetry.solar,
@@ -1004,7 +1222,7 @@ private fun DashboardContent(
                 )
             }
 
-            // 6. NOAA Space Weather Card
+            // 7. NOAA Space Weather Card
             item {
                 SpaceWeatherCard(
                     spaceWeather = telemetry.spaceWeather,

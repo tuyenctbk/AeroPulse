@@ -2,19 +2,16 @@ package com.example.data.repository
 
 import android.util.Log
 import com.example.data.db.LocationDao
-import com.example.data.model.AirQualityHourly
-import com.example.data.model.AirQualityResponse
-import com.example.data.model.CurrentWeather
-import com.example.data.model.DailyWeather
+import com.example.data.db.TelemetryCacheDao
 import com.example.data.model.GeocodingResult
-import com.example.data.model.HourlyWeather
-import com.example.data.model.NoaaKpItem
 import com.example.data.model.SavedLocation
-import com.example.data.model.WeatherResponse
+import com.example.data.model.TelemetryCacheEntity
 import com.example.data.network.NetworkClient
 import com.example.domain.AeroPulseTelemetry
 import com.example.domain.GoNoGoEngine
 import com.example.domain.UserProfile
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -22,9 +19,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
 class AeroPulseRepository(
-    private val locationDao: LocationDao
+    private val locationDao: LocationDao,
+    private val telemetryCacheDao: TelemetryCacheDao
 ) {
     val savedLocations: Flow<List<SavedLocation>> = locationDao.getAllLocations()
+
+    private val moshi: Moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .build()
+
+    private val telemetryAdapter = moshi.adapter(AeroPulseTelemetry::class.java)
 
     suspend fun saveLocation(location: SavedLocation): Long = withContext(Dispatchers.IO) {
         locationDao.insertLocation(location)
@@ -88,19 +92,41 @@ class AeroPulseRepository(
                     profile = profile,
                     isCached = false
                 )
-                lastSuccessfulTelemetry = telemetry
+
+                // Save successfully fetched telemetry into Room cache
+                try {
+                    val json = telemetryAdapter.toJson(telemetry)
+                    telemetryCacheDao.insertCache(
+                        TelemetryCacheEntity(
+                            locationName = locationName,
+                            regionCountry = regionCountry,
+                            latitude = lat,
+                            longitude = lon,
+                            jsonPayload = json,
+                            timestamp = System.currentTimeMillis()
+                        )
+                    )
+                } catch (ce: Exception) {
+                    Log.e("AeroPulseRepo", "Failed to serialize and cache telemetry: ${ce.message}")
+                }
+
                 telemetry
             }
         } catch (e: Exception) {
-            Log.e("AeroPulseRepo", "Remote fetch failed for $locationName", e)
-            val cached = lastSuccessfulTelemetry
-            if (cached != null && cached.locationName.equals(locationName, ignoreCase = true)) {
-                cached.copy(isCachedFallback = true)
-            } else {
-                throw e
+            Log.e("AeroPulseRepo", "Remote fetch failed for $locationName. Attempting Room offline cache fallback...", e)
+            try {
+                val cachedEntity = telemetryCacheDao.getCache(locationName)
+                if (cachedEntity != null) {
+                    val telemetry = telemetryAdapter.fromJson(cachedEntity.jsonPayload)
+                    if (telemetry != null) {
+                        return@withContext telemetry.copy(isCachedFallback = true)
+                    }
+                }
+            } catch (ce: Exception) {
+                Log.e("AeroPulseRepo", "Failed to load from Room telemetry cache: ${ce.message}")
             }
+            throw e
         }
     }
-
-    private var lastSuccessfulTelemetry: AeroPulseTelemetry? = null
 }
+

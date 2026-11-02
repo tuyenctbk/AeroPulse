@@ -38,8 +38,9 @@ class EngagementManager(private val context: Context) {
         const val KEY_HAS_SHARED = "has_shared"
         const val KEY_LAST_UPDATE_PROMPT = "last_update_prompt_timestamp"
 
-        const val MIN_GLOBAL_PROMPT_INTERVAL_MS = 3 * 24 * 60 * 60 * 1000L // 3 days minimum between any prompt
-        const val MIN_UPDATE_PROMPT_INTERVAL_MS = 10 * 24 * 60 * 60 * 1000L // 10 days between update prompts
+        const val MIN_GLOBAL_PROMPT_INTERVAL_MS = 5 * 24 * 60 * 60 * 1000L // 5 days minimum between any prompt to avoid bothering users
+        const val MIN_POSTPONE_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000L // 7 days after 'Remind Later'
+        const val MIN_UPDATE_PROMPT_INTERVAL_MS = 14 * 24 * 60 * 60 * 1000L // 14 days between update prompts
     }
 
     init {
@@ -63,13 +64,25 @@ class EngagementManager(private val context: Context) {
         )
     }
 
-    fun recordRadarCheck(verdictScore: Int = 85): EngagementDialogType {
+    /**
+     * Records a radar telemetry check and determines if a suggestion dialog should be triggered.
+     * @param verdictScore The Go/No-Go score of the active window.
+     * @param isInitialLaunch True if triggered during initial app startup (never prompts on start).
+     */
+    fun recordRadarCheck(verdictScore: Int = 85, isInitialLaunch: Boolean = false): EngagementDialogType {
         val checks = prefs.getInt(KEY_RADAR_CHECKS, 0) + 1
         prefs.edit().putInt(KEY_RADAR_CHECKS, checks).apply()
+
+        // Critical UX Rule: Never interrupt the user with popups upon initial application launch
+        if (isInitialLaunch) {
+            return EngagementDialogType.NONE
+        }
+
         return evaluateSmartPrompt(verdictScore)
     }
 
     fun evaluateSmartPrompt(verdictScore: Int = 85): EngagementDialogType {
+        // Enforce maximum 1 auto-prompt per application session
         if (promptShownThisSession) {
             return EngagementDialogType.NONE
         }
@@ -77,7 +90,7 @@ class EngagementManager(private val context: Context) {
         val now = System.currentTimeMillis()
         val lastPrompt = prefs.getLong(KEY_LAST_PROMPT, 0L)
 
-        // Strict anti-spam rule: minimum 3 days (72h) between showing ANY auto-popup
+        // Strict anti-spam rule: minimum 5 days (120 hours) between auto-popups to avoid annoying users
         if (now - lastPrompt < MIN_GLOBAL_PROMPT_INTERVAL_MS) {
             return EngagementDialogType.NONE
         }
@@ -89,17 +102,17 @@ class EngagementManager(private val context: Context) {
         val hasShared = prefs.getBoolean(KEY_HAS_SHARED, false)
         val lastUpdatePrompt = prefs.getLong(KEY_LAST_UPDATE_PROMPT, 0L)
 
-        // Priority 1: Rate App (User has completed >= 3 scans and score >= 60)
+        // Priority 1: Rate App (User has used the app for >= 3 scans, and current score >= 60)
         if (!hasRated && !ratingDismissedPermanently && checks >= 3 && verdictScore >= 60) {
             return EngagementDialogType.RATE_APP
         }
 
-        // Priority 2: Share App (User has completed >= 5 scans and encounters a great window >= 80)
+        // Priority 2: Share App (User has verified value with >= 5 scans and hits a stellar window >= 80)
         if (!hasShared && checks >= 5 && verdictScore >= 80) {
             return EngagementDialogType.SHARE_APP
         }
 
-        // Priority 3: Update App (User is active with 8+ sessions or 10+ scans, and 10+ days since last update prompt)
+        // Priority 3: Update App (User is active with 8+ sessions or 12+ scans, and 14+ days since last update prompt)
         if (sessions >= 8 && (now - lastUpdatePrompt > MIN_UPDATE_PROMPT_INTERVAL_MS)) {
             return EngagementDialogType.UPDATE_APP
         }
@@ -133,8 +146,8 @@ class EngagementManager(private val context: Context) {
     }
 
     fun onUserRemindLater() {
-        // Postpone by setting last prompt timestamp
-        prefs.edit().putLong(KEY_LAST_PROMPT, System.currentTimeMillis()).apply()
+        // Postpone by setting last prompt timestamp so user is not prompted again for at least 7 days
+        prefs.edit().putLong(KEY_LAST_PROMPT, System.currentTimeMillis() + (MIN_POSTPONE_INTERVAL_MS - MIN_GLOBAL_PROMPT_INTERVAL_MS)).apply()
     }
 
     fun onUserDismissedPermanently() {

@@ -231,4 +231,87 @@
     <string name="no_location_message">Search for any city worldwide or calibrate atmospheric radar with real-time GPS.</string>
     <string name="select_location">Select Location</string>
     <string name="wear_os_no_location">Select a location to preview Wear OS complications and live wrist tile</string>
+
+    <!-- Outdoor Spots & Custom Thresholds -->
+    <string name="outdoor_spots_title">OUTDOOR SPOTS &amp; THRESHOLDS</string>
+    <string name="outdoor_spot_subtitle">User-Defined Air Quality, Pollen &amp; Solar UV Limits</string>
+    <string name="add_outdoor_spot">Add Outdoor Spot</string>
+    <string name="edit_thresholds">Edit Thresholds</string>
+    <string name="spot_name_label">Spot Name</string>
+    <string name="air_quality_thresholds_title">AIR QUALITY THRESHOLDS</string>
+    <string name="pollen_thresholds_title">BOTANICAL POLLEN THRESHOLDS</string>
+    <string name="solar_uv_thresholds_title">SOLAR UV RADIATION THRESHOLDS</string>
+    <string name="threshold_pm25">Max PM2.5</string>
+    <string name="threshold_pm10">Max PM10</string>
+    <string name="threshold_aqi">Max AQI</string>
+    <string name="threshold_ozone">Max Ozone</string>
+    <string name="threshold_grass_pollen">Max Grass Pollen</string>
+    <string name="threshold_ragweed_pollen">Max Ragweed Pollen</string>
+    <string name="threshold_birch_pollen">Max Birch Pollen</string>
+    <string name="threshold_alder_pollen">Max Alder Pollen</string>
+    <string name="threshold_uv_index">Max Solar UV</string>
+    <string name="sun_sensitive_label">Sun-Sensitive Protection Mode</string>
+    <string name="sun_sensitive_desc">Strict solar limits &amp; sunburn warnings for photosensitive skin or children</string>
+    <string name="status_go_within_thresholds">Within user-defined thresholds • Safe for outdoor activity</string>
+    <string name="status_caution_near_threshold">Approaching threshold limit • Moderate caution advised</string>
+    <string name="status_no_go_exceeded">Thresholds exceeded • Outdoor activity not recommended</string>
+    <string name="status_uv_breach">Solar UV (%1$s) exceeds safe threshold for sun-sensitive activity</string>
+    <string name="threshold_exceeded_format">%1$s exceeds threshold: %2$s</string>
+    <string name="threshold_pass_format">%1$s within limit: %2$s</string>
+    <string name="save_spot_button">Save Spot</string>
+    <string name="delete_spot_button">Delete Spot</string>
+    <string name="spot_evaluation_header">THRESHOLD EVALUATION</string>
+    <string name="metric_status_pass">PASS</string>
+    <string name="metric_status_warn">WARN</string>
+    <string name="metric_status_breach">FAIL</string>
+    <string name="spot_coordinates_format">Lat: %1$.4f • Lon: %2$.4f</string>
+    <string name="user_threshold_label">Limit: %1$.0f %2$s</string>
+    <string name="current_reading_label">Current: %1$.1f %2$s</string>
+    <string name="nav_outdoor_spots">Outdoor Spots</string>
+    <string name="spot_threshold_score_title">THRESHOLD COMPLIANCE SCORE</string>
+    <string name="no_outdoor_spots_saved">No outdoor spots saved yet</string>
+    <string name="uv_index_unit">UV</string>
+
+    <!-- 24-Hour UV Forecast & Safe Sun Windows -->
+    <string name="uv_chart_title">24-HOUR UV FORECAST</string>
+    <string name="uv_chart_subtitle">D3 Monotone Spline &amp; Safe Sun Exposure Windows</string>
+    <string name="safe_sun_window_title">SAFE SUN EXPOSURE WINDOW</string>
+    <string name="safe_window_format">Safe without protection: %1$s</string>
+    <string name="peak_uv_hazard_format">Peak UV hazard: %1$s (%2$.1f UV)</string>
+    <string name="threshold_standard">Standard (UV &lt; 3)</string>
+    <string name="threshold_sensitive">Sensitive (UV &lt; 2)</string>
+    <string name="advice_uv_low">Low risk. Minimal sun protection required.</string>
+    <string name="advice_uv_moderate">Moderate risk. Wear sunscreen SPF 30+ &amp; sunglasses.</string>
+    <string name="advice_uv_high">High risk. Seek midday shade, wear a hat &amp; SPF 50+.</string>
+    <string name="advice_uv_very_high">Very high risk. Rapid sunburn possible; limit midday exposure.</string>
+    <string name="advice_uv_extreme">Extreme risk. Avoid direct midday sun exposure.</string>
+    <string name="uv_scrubber_hint">Tap or drag on chart to inspect hourly sun safety</string>
+
+    <!-- Botanical Pollen Heatmap & Dispersion -->
+    <string name="pollen_heatmap_title">BOTANICAL POLLEN HEATMAP</string>
+    <string name="pollen_heatmap_subtitle">Dispersion plumes &amp; allergy zones around %1$s</string>
+    <string name="layer_all_pollen">All Species</string>
+    <string name="range_km_format">%1$d km</string>
+    <string name="wind_plume_format">%1$d km/h Drift</string>
+    <string name="allergy_planning_title">ALLERGY ACTIVITY PLANNING</string>
+    <string name="allergy_hotspot_advice_format">Active botanical plume near %1$s (~%2$d gr/m³). Sensitive individuals should choose upwind routes.</string>
+    <string name="allergy_planning_default_advice">Plan outdoor workouts away from greenbelts during morning spore discharge.</string>
+    <string name="heatmap_tap_hint">Tap map to inspect localized botanical plume intensity</string>
+
+    <!-- Push Notifications & Activity Window Alerts -->
+    <string name="notification_channel_name">Outdoor Window Alerts</string>
+    <string name="notification_channel_desc">High priority alerts when outdoor activity windows open</string>
+    <string name="notification_settings_title">OUTDOOR WINDOW PUSH ALERTS</string>
+    <string name="notification_enable_toggle">Enable Activity Window Notifications</string>
+    <string name="notification_threshold_label">Minimum Score Threshold: %1$d/100 (GO Status)</string>
+    <string name="notification_favs_only_toggle">Alert for Favorite Locations Only</string>
+    <string name="notification_test_button">TEST PUSH NOTIFICATION</string>
+    <string name="notification_test_sent_toast">Test notification sent!</string>
+    <string name="notification_permission_required">Push notification permission required on Android 13+ to receive window alerts.</string>
+    <string name="notification_permission_grant_btn">GRANT NOTIFICATION PERMISSION</string>
+    <string name="notification_window_title">🌿 Outdoor Window Open: %1$s</string>
+    <string name="notification_window_body">Score reached %1$d/100 (%2$s). %3$s</string>
+    <string name="notification_test_title">🔔 AeroPulse Alerts Configured</string>
+    <string name="notification_test_body">Push notifications active! You will receive alerts when Go/No-Go conditions open for your saved locations.</string>
+    <string name="cd_notifications">Notification Settings</string>
 </resources>
